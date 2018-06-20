@@ -6,11 +6,9 @@ Overview
 <https://www.assetstore.unity3d.com/#!/content/118186>
 
 
-ScreenShot
+Demo Video
 -----
-![screenshot01.PNG](screenshot01.PNG) 
-![screenshot02.PNG](screenshot02.PNG) 
-![screenshot03.PNG](screenshot03.PNG) 
+[![](http://img.youtube.com/vi/yGNVo3lT6ws/0.jpg)](https://www.youtube.com/watch?v=yGNVo3lT6ws)
 
 
 Demo
