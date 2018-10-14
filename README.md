@@ -3,8 +3,12 @@ CV VTuber Example
 
 Overview
 -----
-<https://www.assetstore.unity3d.com/#!/content/118186>
+[https://assetstore.unity.com/packages/templates/tutorials/cv-vtuber-example-118186](https://assetstore.unity.com/packages/templates/tutorials/cv-vtuber-example-118186?aid=1011l4ehR)
 
+Environment
+-----
+[OpenCVForUnity](https://assetstore.unity.com/packages/tools/integration/opencv-for-unity-21088?aid=1011l4ehR)  
+[DlibFaceLandmarkDetector](https://assetstore.unity.com/packages/tools/integration/dlib-facelandmark-detector-64314?aid=1011l4ehR)
 
 Demo Video
 -----
