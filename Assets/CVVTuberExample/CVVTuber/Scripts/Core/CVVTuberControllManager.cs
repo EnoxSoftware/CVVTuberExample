@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CVVTuber
 {
-    [RequireComponent(typeof(CVVTuberProcessOrderList))]
+    [RequireComponent (typeof(CVVTuberProcessOrderList))]
     public class CVVTuberControllManager : MonoBehaviour
     {
         protected List<CVVTuberProcess> processOrderList;
@@ -14,7 +14,7 @@ namespace CVVTuber
         {
             enabled = false;
 
-            processOrderList = GetComponent<CVVTuberProcessOrderList>().GetProcessOrderList();
+            processOrderList = GetComponent<CVVTuberProcessOrderList> ().GetProcessOrderList ();
             if (processOrderList == null)
                 yield break;
 

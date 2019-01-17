@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
-
-using OpenCVForUnity;
-using DlibFaceLandmarkDetector;
+using OpenCVForUnity.UnityUtils;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.Calib3dModule;
 
 namespace CVVTuber
 {
@@ -86,7 +86,7 @@ namespace CVVTuber
         {
             return "Get head rotation from DlibFaceLandmarkGetter.";
         }
-            
+
         public override void Setup ()
         {
             //set 3d face object points.
@@ -117,7 +117,7 @@ namespace CVVTuber
 
             didUpdateHeadRotation = false;
         }
-            
+
         public override void UpdateValue ()
         {
             if (matSourceGetter == null)
@@ -142,8 +142,7 @@ namespace CVVTuber
             List<Vector2> points = dlibFaceLanmarkGetter.getFaceLanmarkPoints ();
             if (points != null) {
                 MatOfPoint3f objectPoints = null;
-                if (points.Count == 68)
-                {
+                if (points.Count == 68) {
                     objectPoints = objectPoints_68;
 
                     imagePoints.fromArray (

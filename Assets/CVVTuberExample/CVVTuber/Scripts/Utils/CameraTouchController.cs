@@ -1,19 +1,19 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEngine.EventSystems;
+﻿using System.Collections;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace CVVTuber
-{    
+{
     public class CameraTouchController : MonoBehaviour
-    {       
-        [SerializeField, Range(0.0f, 1.0f)]
+    {
+        [SerializeField, Range (0.0f, 1.0f)]
         private float moveSpeed = 0.01f;
 
-        [SerializeField, Range(0.0f, 1.0f)]
+        [SerializeField, Range (0.0f, 1.0f)]
         private float rotateSpeed = 0.3f;
 
-        [SerializeField, Range(0.0f, 1.0f)]
+        [SerializeField, Range (0.0f, 1.0f)]
         private float zoomSpeed = 0.03f;
 
         private Vector3 preMousePos;
@@ -27,7 +27,7 @@ namespace CVVTuber
             #endif
         }
 
-        private void TouchUpdate()
+        private void TouchUpdate ()
         {
             if (Input.touchCount > 0 && Input.GetTouch (0).phase == TouchPhase.Moved) {
                 if (EventSystem.current != null) {
@@ -79,19 +79,19 @@ namespace CVVTuber
             }
         }
 
-        private void MouseUpdate()
+        private void MouseUpdate ()
         {
-            float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
-            if(scrollWheel != 0.0f)
-                MouseWheel(scrollWheel);
+            float scrollWheel = Input.GetAxis ("Mouse ScrollWheel");
+            if (scrollWheel != 0.0f)
+                MouseWheel (scrollWheel);
 
-            if(Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown (0))
                 preMousePos = Input.mousePosition;
 
-            MouseDrag(Input.mousePosition);
+            MouseDrag (Input.mousePosition);
         }
 
-        private void MouseWheel(float delta)
+        private void MouseWheel (float delta)
         {
             //zoom
             this.transform.localPosition += new Vector3 (0, 0, delta * zoomSpeed * 10);
@@ -104,7 +104,7 @@ namespace CVVTuber
             }
         }
 
-        private void MouseDrag(Vector3 mousePos)
+        private void MouseDrag (Vector3 mousePos)
         {
 
             Vector3 diff = mousePos - preMousePos;

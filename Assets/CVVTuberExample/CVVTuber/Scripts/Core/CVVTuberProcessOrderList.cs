@@ -9,7 +9,7 @@ namespace CVVTuber
         [SerializeField]
         List<CVVTuberProcess> processOrderList;
 
-        public List<CVVTuberProcess> GetProcessOrderList()
+        public List<CVVTuberProcess> GetProcessOrderList ()
         {
             return processOrderList;
         }

@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-using OpenCVForUnity;
+using OpenCVForUnity.UnityUtils.Helper;
+using OpenCVForUnity.CoreModule;
 
 namespace CVVTuber
-{    
+{
     [RequireComponent (typeof(WebCamTextureToMatHelper), typeof(ImageOptimizationHelper))]
     public class WebCamTextureMatSourceGetter : MatSourceGetter
     {
@@ -23,34 +23,21 @@ namespace CVVTuber
 
         bool didUpdateResultMat;
 
-        #if UNITY_ANDROID && !UNITY_EDITOR
-        float rearCameraRequestedFPS;
-        #endif
-
         public override string GetDescription ()
         {
             return "Get mat source from WebCamTexture.";
         }
-        
+
         public override void Setup ()
         {
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper> ();
             imageOptimizationHelper = gameObject.GetComponent<ImageOptimizationHelper> ();
 
             #if UNITY_ANDROID && !UNITY_EDITOR
-            // Set the requestedFPS parameter to avoid the problem of the WebCamTexture image becoming low light on some Android devices. (Pixel, pixel 2)
-            // https://forum.unity.com/threads/android-webcamtexture-in-low-light-only-some-models.520656/
-            // https://forum.unity.com/threads/released-opencv-for-unity.277080/page-33#post-3445178
-            rearCameraRequestedFPS = webCamTextureToMatHelper.requestedFPS;
-            if (webCamTextureToMatHelper.requestedIsFrontFacing) {                
-                webCamTextureToMatHelper.requestedFPS = 15;
-                webCamTextureToMatHelper.Initialize ();
-            } else {
-                webCamTextureToMatHelper.Initialize ();
-            }
-            #else
-            webCamTextureToMatHelper.Initialize ();
+            // Avoids the front camera low light issue that occurs in only some Android devices (e.g. Google Pixel, Pixel2).
+            webCamTextureToMatHelper.avoidAndroidFrontCameraLowLightIssue = true;
             #endif
+            webCamTextureToMatHelper.Initialize ();
 
             didUpdateResultMat = false;
         }
@@ -81,7 +68,7 @@ namespace CVVTuber
         {
             Debug.Log ("OnWebCamTextureToMatHelperErrorOccurred " + errorCode);
         }
-        
+
         public override void UpdateValue ()
         {
             didUpdateResultMat = false;
@@ -116,19 +103,10 @@ namespace CVVTuber
                 return null;
             }
         }
-            
+
         public virtual void ChangeCamera ()
         {
-            #if UNITY_ANDROID && !UNITY_EDITOR
-            if (!webCamTextureToMatHelper.IsFrontFacing ()) {
-                rearCameraRequestedFPS = webCamTextureToMatHelper.requestedFPS;
-                webCamTextureToMatHelper.Initialize (!webCamTextureToMatHelper.IsFrontFacing (), 15, webCamTextureToMatHelper.rotate90Degree);
-            } else {                
-                webCamTextureToMatHelper.Initialize (!webCamTextureToMatHelper.IsFrontFacing (), rearCameraRequestedFPS, webCamTextureToMatHelper.rotate90Degree);
-            }
-            #else
             webCamTextureToMatHelper.requestedIsFrontFacing = !webCamTextureToMatHelper.IsFrontFacing ();
-            #endif
         }
     }
 }

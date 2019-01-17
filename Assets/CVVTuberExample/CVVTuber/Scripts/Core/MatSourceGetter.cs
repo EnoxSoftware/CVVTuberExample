@@ -1,8 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-using OpenCVForUnity;
+using OpenCVForUnity.CoreModule;
 
 namespace CVVTuber
 {

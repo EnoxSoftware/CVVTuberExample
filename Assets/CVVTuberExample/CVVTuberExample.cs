@@ -1,13 +1,14 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine.UI;
-
-#if UNITY_5_3 || UNITY_5_3_OR_NEWER
 using UnityEngine.SceneManagement;
-#endif
+using UnityEngine;
+using OpenCVForUnity.CoreModule;
 
 namespace CVVTuberExample
 {
+    /// <summary>
+    /// CV VTuber Example
+    /// </summary>
     public class CVVTuberExample : MonoBehaviour
     {
         public Text exampleTitle;
@@ -20,8 +21,8 @@ namespace CVVTuberExample
         {
             exampleTitle.text = "CV VTuber Example " + Application.version;
 
-            versionInfo.text = "opencvforuntiy" + " " + OpenCVForUnity.Utils.getVersion ();
-            versionInfo.text += " / dlibfacelandmarkdetector" + " " + DlibFaceLandmarkDetector.Utils.getVersion ();
+            versionInfo.text = Core.NATIVE_LIBRARY_NAME + " " + OpenCVForUnity.UnityUtils.Utils.getVersion () + " (" + Core.VERSION + ")";
+            versionInfo.text += " / dlibfacelandmarkdetector" + " " + DlibFaceLandmarkDetector.UnityUtils.Utils.getVersion ();
             versionInfo.text += " / UnityEditor " + Application.unityVersion;
             versionInfo.text += " / ";
 
@@ -69,65 +70,38 @@ namespace CVVTuberExample
 
         public void OnShowOpenCVLicenseButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("ShowOpenCVLicense");
-            #else
-            Application.LoadLevel ("ShowOpenCVLicense");
-            #endif
         }
 
         public void OnWebCamTextureCVVTuberExampleButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("WebCamTextureCVVTuberExample");
-            #else
-            Application.LoadLevel ("WebCamTextureCVVTuberExample");
-            #endif
         }
 
         public void OnVideoCaptureCVVTuberExampleButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("VideoCaptureCVVTuberExample");
-            #else
-            Application.LoadLevel ("VideoCaptureCVVTuberExample");
-            #endif
         }
 
 
         public void OnShowUnityChanLicenseButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("ShowUnityChanLicense");
-            #else
-            Application.LoadLevel ("ShowUnityChanLicense");
-            #endif
         }
+
         public void OnUnityChanCVVTuberExampleButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("UnityChanCVVTuberExample");
-            #else
-            Application.LoadLevel ("UnityChanCVVTuberExample");
-            #endif
         }
 
         public void OnLive2DCubism2CVVTuberExampleButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("Live2DCubism2CVVTuberExample");
-            #else
-            Application.LoadLevel ("Live2DCubism2CVVTuberExample");
-            #endif
         }
 
         public void OnVRMCVVTuberExampleButtonClick ()
         {
-            #if UNITY_5_3 || UNITY_5_3_OR_NEWER
             SceneManager.LoadScene ("VRMCVVTuberExample");
-            #else
-            Application.LoadLevel ("VRMCVVTuberExample");
-            #endif
         }
     }
 }

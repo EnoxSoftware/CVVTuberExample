@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-
-using OpenCVForUnity;
+using OpenCVForUnity.UnityUtils.Helper;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.VideoioModule;
+using OpenCVForUnity.ImgprocModule;
+using VideoCapture = OpenCVForUnity.VideoioModule.VideoCapture;
 
 namespace CVVTuber
 {
@@ -39,24 +42,23 @@ namespace CVVTuber
         bool shouldUpdateVideoFrame = false;
 
         #if UNITY_WEBGL && !UNITY_EDITOR
-        Stack<IEnumerator> coroutines = new Stack<IEnumerator> ();
+        IEnumerator getFilePath_Coroutine;
         #endif
 
         public override string GetDescription ()
         {
             return "Get mat source from VideoCapture.";
         }
-            
+
         public override void Setup ()
         {
             imageOptimizationHelper = gameObject.GetComponent<ImageOptimizationHelper> ();
 
             #if UNITY_WEBGL && !UNITY_EDITOR
-            var getFilePath_Coroutine = GetFilePath ();
-            coroutines.Push (getFilePath_Coroutine);
+            getFilePath_Coroutine = GetFilePath ();
             StartCoroutine (getFilePath_Coroutine);
             #else
-            video_file_filepath = OpenCVForUnity.Utils.getFilePath (videoFileName);
+            video_file_filepath = OpenCVForUnity.UnityUtils.Utils.getFilePath (videoFileName);
             Run ();
             #endif
 
@@ -66,13 +68,12 @@ namespace CVVTuber
         #if UNITY_WEBGL && !UNITY_EDITOR
         private IEnumerator GetFilePath ()
         {
-            var getFilePathAsync_Coroutine = OpenCVForUnity.Utils.getFilePathAsync (videoFileName, (result) => {
+            var getFilePathAsync_Coroutine = OpenCVForUnity.UnityUtils.Utils.getFilePathAsync (videoFileName, (result) => {
                 video_file_filepath = result;
             });
-            coroutines.Push (getFilePathAsync_Coroutine);
-            yield return StartCoroutine (getFilePathAsync_Coroutine);
+            yield return getFilePathAsync_Coroutine;
 
-            coroutines.Clear ();
+            getFilePath_Coroutine = null;
 
             Run ();
         }
@@ -93,7 +94,6 @@ namespace CVVTuber
             }
 
             Debug.Log ("CAP_PROP_FORMAT: " + capture.get (Videoio.CAP_PROP_FORMAT));
-            Debug.Log ("CV_CAP_PROP_PREVIEW_FORMAT: " + capture.get (Videoio.CV_CAP_PROP_PREVIEW_FORMAT));
             Debug.Log ("CAP_PROP_POS_MSEC: " + capture.get (Videoio.CAP_PROP_POS_MSEC));
             Debug.Log ("CAP_PROP_POS_FRAMES: " + capture.get (Videoio.CAP_PROP_POS_FRAMES));
             Debug.Log ("CAP_PROP_POS_AVI_RATIO: " + capture.get (Videoio.CAP_PROP_POS_AVI_RATIO));
@@ -108,7 +108,7 @@ namespace CVVTuber
 
             StartCoroutine ("WaitFrameTime");
         }
-            
+
         public override void UpdateValue ()
         {
             if (capture == null)
@@ -133,7 +133,7 @@ namespace CVVTuber
                 }
             }
         }
-            
+
         public override void Dispose ()
         {
             StopCoroutine ("WaitFrameTime");
@@ -155,9 +155,9 @@ namespace CVVTuber
             }
 
             #if UNITY_WEBGL && !UNITY_EDITOR
-            foreach (var coroutine in coroutines) {
-                StopCoroutine (coroutine);
-                ((IDisposable)coroutine).Dispose ();
+            if (getFilePath_Coroutine != null) {
+                StopCoroutine (getFilePath_Coroutine);
+                ((IDisposable)getFilePath_Coroutine).Dispose ();
             }
             #endif
         }

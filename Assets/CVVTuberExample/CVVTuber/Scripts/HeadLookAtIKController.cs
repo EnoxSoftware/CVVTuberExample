@@ -50,17 +50,17 @@ namespace CVVTuber
                 if (lookAtTarget != null) {
                     headLookAtIKController.looktAtTarget = lookAtTarget;
                 } else {
-                    Debug.LogWarning ("[" + this.GetType().FullName + "] " + System.Reflection.MethodBase.GetCurrentMethod().Name + " lookAtTarget == null");
+                    Debug.LogWarning ("[" + this.GetType ().FullName + "] " + System.Reflection.MethodBase.GetCurrentMethod ().Name + " lookAtTarget == null");
                 }
             } else {
-                Debug.LogWarning ("[" + this.GetType().FullName + "] " + System.Reflection.MethodBase.GetCurrentMethod().Name + " target == null");
+                Debug.LogWarning ("[" + this.GetType ().FullName + "] " + System.Reflection.MethodBase.GetCurrentMethod ().Name + " target == null");
                 enabled = false;
             }
 
             if (lookAtRoot != null) {
                 oldHeadEulerAngle = lookAtRoot.localEulerAngles;
             } else {
-                Debug.LogWarning ("[" + this.GetType().FullName + "] " + System.Reflection.MethodBase.GetCurrentMethod().Name + " lookAtRoot == null");
+                Debug.LogWarning ("[" + this.GetType ().FullName + "] " + System.Reflection.MethodBase.GetCurrentMethod ().Name + " lookAtRoot == null");
             }
         }
 
@@ -79,8 +79,7 @@ namespace CVVTuber
                 headEulerAngles = Quaternion.Euler (rotateXAxis ? 90 : 0, rotateYAxis ? 90 : 0, rotateZAxis ? 90 : 0) * headEulerAngles;
             }
 
-            if (leapAngle)
-            {
+            if (leapAngle) {
                 lookAtRoot.localEulerAngles = new Vector3 (Mathf.LerpAngle (oldHeadEulerAngle.x, headEulerAngles.x, leapT), Mathf.LerpAngle (oldHeadEulerAngle.y, headEulerAngles.y, leapT), Mathf.LerpAngle (oldHeadEulerAngle.z, headEulerAngles.z, leapT));
             } else {
                 lookAtRoot.localEulerAngles = headEulerAngles;

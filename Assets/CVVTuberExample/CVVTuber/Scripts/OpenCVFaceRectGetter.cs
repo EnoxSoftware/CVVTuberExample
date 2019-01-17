@@ -1,11 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 using UnityEngine.UI;
-
-using OpenCVForUnity;
-using DlibFaceLandmarkDetector;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.ObjdetectModule;
+using OpenCVForUnity.ImgprocModule;
+using Rect = OpenCVForUnity.CoreModule.Rect;
 
 namespace CVVTuber
 {
@@ -59,30 +60,29 @@ namespace CVVTuber
         string openCVCascadeFilePath;
 
         #if UNITY_WEBGL && !UNITY_EDITOR
-        Stack<IEnumerator> coroutines = new Stack<IEnumerator> ();
+        IEnumerator getFilePath_Coroutine;
         #endif
 
         public override string GetDescription ()
         {
             return "Get face rect from MatSourceGetter.";
         }
-            
+
         public override void Setup ()
         {
-            if (string.IsNullOrEmpty(openCVCascadeFileName))
+            if (string.IsNullOrEmpty (openCVCascadeFileName))
                 openCVCascadeFileName = openCVCascadeFileNamePreset;
 
             #if UNITY_WEBGL && !UNITY_EDITOR
-            var getFilePathAsync_Coroutine = OpenCVForUnity.Utils.getFilePathAsync (openCVCascadeFileName, (result) => {
-                coroutines.Clear ();
+            getFilePathAsync_Coroutine = OpenCVForUnity.UnityUtils.Utils.getFilePathAsync (openCVCascadeFileName, (result) => {
+                getFilePath_Coroutine = null;
 
                 openCVCascadeFilePath = result;
                 Run ();
             });
-            coroutines.Push (getFilePathAsync_Coroutine);
             StartCoroutine (getFilePathAsync_Coroutine);
             #else
-            openCVCascadeFilePath = OpenCVForUnity.Utils.getFilePath (openCVCascadeFileName);
+            openCVCascadeFilePath = OpenCVForUnity.UnityUtils.Utils.getFilePath (openCVCascadeFileName);
             Run ();
             #endif
         }
@@ -124,7 +124,7 @@ namespace CVVTuber
                     debugMat = debugMat ?? new Mat (rgbaMat.rows (), rgbaMat.cols (), rgbaMat.type ());
 
                     if (hideImage) {
-                        debugMat.setTo (new Scalar(0, 0, 0, 255));
+                        debugMat.setTo (new Scalar (0, 0, 0, 255));
                     } else {
                         rgbaMat.copyTo (debugMat);
                     }
@@ -160,7 +160,7 @@ namespace CVVTuber
                         new Size (grayMat.cols () * 0.2, grayMat.rows () * 0.2), new Size ());
 
 
-                OpenCVForUnity.Rect[] rects = faces.toArray ();
+                Rect[] rects = faces.toArray ();
                 for (int i = 0; i < rects.Length; i++) {
                     if (i == 0) {
 
@@ -175,10 +175,10 @@ namespace CVVTuber
                     }
                 }
 
-                //Imgproc.putText (debugMat, "W:" + debugMat.width () + " H:" + debugMat.height () + " SO:" + Screen.orientation, new Point (5, debugMat.rows () - 10), Core.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+//                Imgproc.putText (debugMat, "W:" + debugMat.width () + " H:" + debugMat.height () + " SO:" + Screen.orientation, new Point (5, debugMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
 
                 if (isDebugMode && screen != null) {
-                    OpenCVForUnity.Utils.matToTexture2D (debugMat, debugTexture, debugColors);
+                    OpenCVForUnity.UnityUtils.Utils.matToTexture2D (debugMat, debugTexture, debugColors);
                 }
             }
         }
@@ -204,9 +204,9 @@ namespace CVVTuber
             }
 
             #if UNITY_WEBGL && !UNITY_EDITOR
-            foreach (var coroutine in coroutines) {
-                StopCoroutine (coroutine);
-                ((IDisposable)coroutine).Dispose ();
+            if (getFilePath_Coroutine != null) {
+                StopCoroutine (getFilePath_Coroutine);
+                ((IDisposable)getFilePath_Coroutine).Dispose ();
             }
             #endif
         }

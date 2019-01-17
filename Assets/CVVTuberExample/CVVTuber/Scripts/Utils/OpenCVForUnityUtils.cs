@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
-using System;
 using System.Collections.Generic;
-
-using OpenCVForUnity;
+using UnityEngine;
 using DlibFaceLandmarkDetector;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.ImgprocModule;
 
 namespace CVVTuber
 {
@@ -48,8 +48,8 @@ namespace CVVTuber
         public static void DrawFaceRect (Mat imgMat, DlibFaceLandmarkDetector.FaceLandmarkDetector.RectDetection rect, Scalar color, int thickness)
         {            
             UnityEngine.Rect _rect = rect.rect;
-            Imgproc.putText (imgMat, "detection_confidence : " + rect.detection_confidence, new Point (_rect.xMin, _rect.yMin - 20), Core.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
-            Imgproc.putText (imgMat, "weight_index : " + rect.weight_index, new Point (_rect.xMin, _rect.yMin - 5), Core.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+            Imgproc.putText (imgMat, "detection_confidence : " + rect.detection_confidence, new Point (_rect.xMin, _rect.yMin - 20), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+            Imgproc.putText (imgMat, "weight_index : " + rect.weight_index, new Point (_rect.xMin, _rect.yMin - 5), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
             Imgproc.rectangle (imgMat, new Point (_rect.xMin, _rect.yMin), new Point (_rect.xMax, _rect.yMax), color, thickness);
         }
 
@@ -63,10 +63,10 @@ namespace CVVTuber
         public static void DrawFaceRect (Mat imgMat, double[] rect, Scalar color, int thickness)
         {            
             if (rect.Length > 4)
-                Imgproc.putText (imgMat, "detection_confidence : " + rect[4], new Point (rect[0], rect[1] - 20), Core.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+                Imgproc.putText (imgMat, "detection_confidence : " + rect [4], new Point (rect [0], rect [1] - 20), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
             if (rect.Length > 5)
-                Imgproc.putText (imgMat, "weight_index : " + rect[5], new Point (rect[0], rect[1] - 5), Core.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
-            Imgproc.rectangle (imgMat, new Point (rect[0], rect[1]), new Point (rect[0] + rect[2], rect[1] + rect[3]), color, thickness);
+                Imgproc.putText (imgMat, "weight_index : " + rect [5], new Point (rect [0], rect [1] - 5), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+            Imgproc.rectangle (imgMat, new Point (rect [0], rect [1]), new Point (rect [0] + rect [2], rect [1] + rect [3]), color, thickness);
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace CVVTuber
             // Draw the index number of facelandmark points.
             if (drawIndexNumbers) {
                 for (int i = 0; i < points.Count; ++i)
-                    Imgproc.putText (imgMat, i.ToString (), new Point (points [i].x, points [i].y), Core.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+                    Imgproc.putText (imgMat, i.ToString (), new Point (points [i].x, points [i].y), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
             }
         }
 
@@ -189,7 +189,7 @@ namespace CVVTuber
             // Draw the index number of facelandmark points.
             if (drawIndexNumbers) {
                 for (int i = 0; i < points.Count; ++i)
-                    Imgproc.putText (imgMat, i.ToString (), points [i], Core.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+                    Imgproc.putText (imgMat, i.ToString (), points [i], Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
             }
         }
 
@@ -278,7 +278,7 @@ namespace CVVTuber
             }
 
             for (int i = 0; i < pts.Count; ++i) {
-                vecs.Add (new Vector2((float)pts[i].x, (float)pts[i].y));
+                vecs.Add (new Vector2 ((float)pts [i].x, (float)pts [i].y));
             }
 
             return vecs;
@@ -324,7 +324,7 @@ namespace CVVTuber
             }
 
             for (int i = 0; i < vecs.Count; ++i) {
-                vecs [i] = new Vector2((float)arr [i * 2], (float)arr [i * 2 + 1]);
+                vecs [i] = new Vector2 ((float)arr [i * 2], (float)arr [i * 2 + 1]);
             }
 
             return vecs;

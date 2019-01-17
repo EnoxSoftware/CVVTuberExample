@@ -1,14 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 using UnityEngine.UI;
-
-using OpenCVForUnity;
 using DlibFaceLandmarkDetector;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.ImgprocModule;
 
 namespace CVVTuber
-{    
+{
     public class DlibFaceLandmarkGetter : CVVTuberProcess
     {
         public string dlibShapePredictorFileName;
@@ -58,37 +58,36 @@ namespace CVVTuber
         string dlibShapePredictorFilePath;
 
         #if UNITY_WEBGL && !UNITY_EDITOR
-        Stack<IEnumerator> coroutines = new Stack<IEnumerator> ();
+        IEnumerator getFilePath_Coroutine;
         #endif
 
         public override string GetDescription ()
         {
             return "Get face landmark points from MatSourceGetter.";
         }
-            
+
         public override void Setup ()
         {
-            if (string.IsNullOrEmpty(dlibShapePredictorFileName))
+            if (string.IsNullOrEmpty (dlibShapePredictorFileName))
                 dlibShapePredictorFileName = dlibShapePredictorFileNamePreset;
 
-            if (string.IsNullOrEmpty(dlibShapePredictorMobileFileName))
+            if (string.IsNullOrEmpty (dlibShapePredictorMobileFileName))
                 dlibShapePredictorMobileFileName = dlibShapePredictorMobileFileNamePreset;
 
 
             #if UNITY_WEBGL && !UNITY_EDITOR
-            var getFilePath_Coroutine = DlibFaceLandmarkDetector.Utils.getFilePathAsync (dlibShapePredictorMobileFileName, (result) => {
-                coroutines.Clear ();
+            getFilePath_Coroutine = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePathAsync (dlibShapePredictorMobileFileName, (result) => {
+                getFilePath_Coroutine = null;
 
                 dlibShapePredictorFilePath = result;
                 Run ();
             });
-            coroutines.Push (getFilePath_Coroutine);
             StartCoroutine (getFilePath_Coroutine);
             #else
             #if UNITY_ANDROID || UNITY_IOS
-            dlibShapePredictorFilePath = DlibFaceLandmarkDetector.Utils.getFilePath (dlibShapePredictorMobileFileName);
+            dlibShapePredictorFilePath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath (dlibShapePredictorMobileFileName);
             #else
-            dlibShapePredictorFilePath = DlibFaceLandmarkDetector.Utils.getFilePath (dlibShapePredictorFileName);
+            dlibShapePredictorFilePath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath (dlibShapePredictorFileName);
             #endif
             Run ();
             #endif
@@ -100,7 +99,7 @@ namespace CVVTuber
 
             didUpdateFaceLanmarkPoints = false;
         }
-            
+
         public override void UpdateValue ()
         {
             if (faceLandmarkDetector == null)
@@ -122,7 +121,7 @@ namespace CVVTuber
                     debugMat = debugMat ?? new Mat (rgbaMat.rows (), rgbaMat.cols (), rgbaMat.type ());
 
                     if (hideImage) {
-                        debugMat.setTo (new Scalar(0, 0, 0, 255));
+                        debugMat.setTo (new Scalar (0, 0, 0, 255));
                     } else {
                         rgbaMat.copyTo (debugMat);
                     }
@@ -191,10 +190,10 @@ namespace CVVTuber
                     }
                 }
 
-                //Imgproc.putText (debugMat, "W:" + debugMat.width () + " H:" + debugMat.height () + " SO:" + Screen.orientation, new Point (5, debugMat.rows () - 10), Core.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+//                Imgproc.putText (debugMat, "W:" + debugMat.width () + " H:" + debugMat.height () + " SO:" + Screen.orientation, new Point (5, debugMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
 
                 if (isDebugMode && screen != null) {
-                    OpenCVForUnity.Utils.matToTexture2D (debugMat, debugTexture, debugColors);
+                    OpenCVForUnity.UnityUtils.Utils.matToTexture2D (debugMat, debugTexture, debugColors);
                 }
             }
         }
@@ -215,9 +214,9 @@ namespace CVVTuber
             }
 
             #if UNITY_WEBGL && !UNITY_EDITOR
-            foreach (var coroutine in coroutines) {
-                StopCoroutine (coroutine);
-                ((IDisposable)coroutine).Dispose ();
+            if (getFilePath_Coroutine != null) {
+                StopCoroutine (getFilePath_Coroutine);
+                ((IDisposable)getFilePath_Coroutine).Dispose ();
             }
             #endif
         }
