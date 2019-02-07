@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CVVTuber
 {
-    [RequireComponent (typeof(CVVTuberProcessOrderList))]
+    [DisallowMultipleComponent, RequireComponent (typeof(CVVTuberProcessOrderList))]
     public class CVVTuberControllManager : MonoBehaviour
     {
         protected List<CVVTuberProcess> processOrderList;
@@ -13,6 +13,8 @@ namespace CVVTuber
         protected virtual IEnumerator Start ()
         {
             enabled = false;
+
+            yield return null;
 
             processOrderList = GetComponent<CVVTuberProcessOrderList> ().GetProcessOrderList ();
             if (processOrderList == null)
@@ -75,7 +77,7 @@ namespace CVVTuber
 
         public virtual void Dispose ()
         {
-
+            
         }
     }
 }

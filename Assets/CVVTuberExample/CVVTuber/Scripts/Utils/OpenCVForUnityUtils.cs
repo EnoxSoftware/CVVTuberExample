@@ -71,7 +71,7 @@ namespace CVVTuber
 
         /// <summary>
         /// Draws a face landmark.
-        /// This method supports 68 landmark points.
+        /// This method supports 68,17,6,5 landmark points.
         /// </summary>
         /// <param name="imgMat">Image mat.</param>
         /// <param name="points">Points.</param>
@@ -86,6 +86,37 @@ namespace CVVTuber
                 Imgproc.line (imgMat, new Point (points [1].x, points [1].y), new Point (points [4].x, points [4].y), color, thickness);
                 Imgproc.line (imgMat, new Point (points [4].x, points [4].y), new Point (points [3].x, points [3].y), color, thickness);
                 Imgproc.line (imgMat, new Point (points [3].x, points [3].y), new Point (points [2].x, points [2].y), color, thickness);
+
+            } else if (points.Count == 6) {
+
+                Imgproc.line (imgMat, new Point (points [2].x, points [2].y), new Point (points [3].x, points [3].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [4].x, points [4].y), new Point (points [5].x, points [5].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [3].x, points [3].y), new Point (points [0].x, points [0].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [4].x, points [4].y), new Point (points [0].x, points [0].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [0].x, points [0].y), new Point (points [1].x, points [1].y), color, thickness);
+
+            } else if (points.Count == 17) {
+
+                Imgproc.line (imgMat, new Point (points [2].x, points [2].y), new Point (points [9].x, points [9].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [9].x, points [9].y), new Point (points [3].x, points [3].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [3].x, points [3].y), new Point (points [10].x, points [10].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [10].x, points [10].y), new Point (points [2].x, points [2].y), color, thickness);
+
+                Imgproc.line (imgMat, new Point (points [4].x, points [4].y), new Point (points [11].x, points [11].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [11].x, points [11].y), new Point (points [5].x, points [5].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [5].x, points [5].y), new Point (points [12].x, points [12].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [12].x, points [12].y), new Point (points [4].x, points [4].y), color, thickness);
+
+                Imgproc.line (imgMat, new Point (points [3].x, points [3].y), new Point (points [0].x, points [0].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [4].x, points [4].y), new Point (points [0].x, points [0].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [0].x, points [0].y), new Point (points [1].x, points [1].y), color, thickness);
+
+                for (int i = 14; i <= 16; ++i)
+                    Imgproc.line (imgMat, new Point (points [i].x, points [i].y), new Point (points [i - 1].x, points [i - 1].y), color, thickness);
+                Imgproc.line (imgMat, new Point (points [16].x, points [16].y), new Point (points [13].x, points [13].y), color, thickness);
+
+                for (int i = 6; i <= 8; i++)
+                    Imgproc.circle (imgMat, new Point (points [i].x, points [i].y), 2, color, -1);
 
             } else if (points.Count == 68) {
                 
@@ -133,7 +164,7 @@ namespace CVVTuber
 
         /// <summary>
         /// Draws a face landmark.
-        /// This method supports 68 landmark points.
+        /// This method supports 68,17,6,5 landmark points.
         /// </summary>
         /// <param name="imgMat">Image mat.</param>
         /// <param name="points">Points.</param>
@@ -148,6 +179,37 @@ namespace CVVTuber
                 Imgproc.line (imgMat, points [1], points [4], color, thickness);
                 Imgproc.line (imgMat, points [4], points [3], color, thickness);
                 Imgproc.line (imgMat, points [3], points [2], color, thickness);
+
+            } else if (points.Count == 6) {
+
+                Imgproc.line (imgMat, points [2], points [3], color, thickness);
+                Imgproc.line (imgMat, points [4], points [5], color, thickness);
+                Imgproc.line (imgMat, points [3], points [0], color, thickness);
+                Imgproc.line (imgMat, points [4], points [0], color, thickness);
+                Imgproc.line (imgMat, points [0], points [1], color, thickness);
+
+            } else if (points.Count == 17) {
+
+                Imgproc.line (imgMat, points [2], points [9], color, thickness);
+                Imgproc.line (imgMat, points [9], points [3], color, thickness);
+                Imgproc.line (imgMat, points [3], points [10], color, thickness);
+                Imgproc.line (imgMat, points [10], points [2], color, thickness);
+
+                Imgproc.line (imgMat, points [4], points [11], color, thickness);
+                Imgproc.line (imgMat, points [11], points [5], color, thickness);
+                Imgproc.line (imgMat, points [5], points [12], color, thickness);
+                Imgproc.line (imgMat, points [12], points [4], color, thickness);
+
+                Imgproc.line (imgMat, points [3], points [0], color, thickness);
+                Imgproc.line (imgMat, points [4], points [0], color, thickness);
+                Imgproc.line (imgMat, points [0], points [1], color, thickness);
+
+                for (int i = 14; i <= 16; ++i)
+                    Imgproc.line (imgMat, points [i], points [i - 1], color, thickness);
+                Imgproc.line (imgMat, points [16], points [13], color, thickness);
+
+                for (int i = 6; i <= 8; i++)
+                    Imgproc.circle (imgMat, points [i], 2, color, -1);
 
             } else if (points.Count == 68) {
 
@@ -195,7 +257,7 @@ namespace CVVTuber
 
         /// <summary>
         /// Draws a face landmark.
-        /// This method supports 68 landmark points.
+        /// This method supports 68,17,6,5 landmark points.
         /// </summary>
         /// <param name="imgMat">Image mat.</param>
         /// <param name="points">Detected object landmark data.[x_0, y_0, x_1, y_1, ...]</param>

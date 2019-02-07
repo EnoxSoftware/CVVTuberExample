@@ -7,21 +7,20 @@ using OpenCVForUnity.CoreModule;
 namespace CVVTuber
 {
     [RequireComponent (typeof(WebCamTextureToMatHelper), typeof(ImageOptimizationHelper))]
-    public class WebCamTextureMatSourceGetter : MatSourceGetter
+    public class WebCamTextureMatSourceGetter : CVVTuberProcess, IMatSourceGetter
     {
-        /// <summary>
-        /// The webcam texture to mat helper.
-        /// </summary>
-        WebCamTextureToMatHelper webCamTextureToMatHelper;
+        protected WebCamTextureToMatHelper webCamTextureToMatHelper;
 
-        /// <summary>
-        /// The image optimization helper.
-        /// </summary>
-        ImageOptimizationHelper imageOptimizationHelper;
+        protected ImageOptimizationHelper imageOptimizationHelper;
 
-        Mat resultMat;
+        protected Mat resultMat;
 
-        bool didUpdateResultMat;
+        protected Mat downScaleResultMat;
+
+        protected bool didUpdateResultMat;
+
+
+        #region CVVTuberProcess
 
         public override string GetDescription ()
         {
@@ -33,40 +32,9 @@ namespace CVVTuber
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper> ();
             imageOptimizationHelper = gameObject.GetComponent<ImageOptimizationHelper> ();
 
-            #if UNITY_ANDROID && !UNITY_EDITOR
-            // Avoids the front camera low light issue that occurs in only some Android devices (e.g. Google Pixel, Pixel2).
-            webCamTextureToMatHelper.avoidAndroidFrontCameraLowLightIssue = true;
-            #endif
             webCamTextureToMatHelper.Initialize ();
 
             didUpdateResultMat = false;
-        }
-
-        /// <summary>
-        /// Raises the web cam texture to mat helper initialized event.
-        /// </summary>
-        public virtual void OnWebCamTextureToMatHelperInitialized ()
-        {
-            Debug.Log ("OnWebCamTextureToMatHelperInitialized");
-
-        }
-
-        /// <summary>
-        /// Raises the web cam texture to mat helper disposed event.
-        /// </summary>
-        public virtual void OnWebCamTextureToMatHelperDisposed ()
-        {
-            Debug.Log ("OnWebCamTextureToMatHelperDisposed");
-
-        }
-
-        /// <summary>
-        /// Raises the web cam texture to mat helper error occurred event.
-        /// </summary>
-        /// <param name="errorCode">Error code.</param>
-        public virtual void OnWebCamTextureToMatHelperErrorOccurred (WebCamTextureToMatHelper.ErrorCode errorCode)
-        {
-            Debug.Log ("OnWebCamTextureToMatHelperErrorOccurred " + errorCode);
         }
 
         public override void UpdateValue ()
@@ -75,7 +43,8 @@ namespace CVVTuber
 
             if (webCamTextureToMatHelper.IsPlaying () && webCamTextureToMatHelper.DidUpdateThisFrame () && !imageOptimizationHelper.IsCurrentFrameSkipped ()) {
 
-                resultMat = imageOptimizationHelper.GetDownScaleMat (webCamTextureToMatHelper.GetMat ());
+                resultMat = webCamTextureToMatHelper.GetMat ();
+                downScaleResultMat = imageOptimizationHelper.GetDownScaleMat (resultMat);
 
                 didUpdateResultMat = true;
             }
@@ -95,7 +64,12 @@ namespace CVVTuber
             }
         }
 
-        public override Mat GetMatSource ()
+        #endregion
+
+
+        #region IMatSourceGetter
+
+        public virtual Mat GetMatSource ()
         {
             if (didUpdateResultMat) {
                 return resultMat;
@@ -104,9 +78,57 @@ namespace CVVTuber
             }
         }
 
+        public virtual Mat GetDownScaleMatSource ()
+        {
+            if (didUpdateResultMat) {
+                return downScaleResultMat;
+            } else {
+                return null;
+            }
+        }
+
+        public virtual float GetDownScaleRatio ()
+        {
+            return imageOptimizationHelper.downscaleRatio;
+        }
+
+        #endregion
+
+
+        public virtual void Play ()
+        {
+            webCamTextureToMatHelper.Play ();
+        }
+
+        public virtual void Pause ()
+        {
+            webCamTextureToMatHelper.Pause ();
+        }
+
+        public virtual void Stop ()
+        {
+            webCamTextureToMatHelper.Stop ();
+        }
+
         public virtual void ChangeCamera ()
         {
+            #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
+            string deviceName = webCamTextureToMatHelper.GetDeviceName ();
+            int nextCameraIndex = -1;
+            for (int cameraIndex = 0; cameraIndex < WebCamTexture.devices.Length; cameraIndex++) {
+                if (WebCamTexture.devices [cameraIndex].name == deviceName) {
+                    nextCameraIndex = ++cameraIndex % WebCamTexture.devices.Length;
+                    break;
+                }
+            }
+            if (nextCameraIndex != -1) {
+                webCamTextureToMatHelper.requestedDeviceName = nextCameraIndex.ToString ();
+            } else {
+                webCamTextureToMatHelper.requestedIsFrontFacing = !webCamTextureToMatHelper.IsFrontFacing ();
+            }
+            #else
             webCamTextureToMatHelper.requestedIsFrontFacing = !webCamTextureToMatHelper.IsFrontFacing ();
+            #endif
         }
     }
 }

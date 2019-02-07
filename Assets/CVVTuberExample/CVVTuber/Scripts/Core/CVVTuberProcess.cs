@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace CVVTuber
 {
-    public class CVVTuberProcess : MonoBehaviour
+    public abstract class CVVTuberProcess : MonoBehaviour
     {
         public bool callInUnityLifeCycle;
 
@@ -68,6 +69,17 @@ namespace CVVTuber
         public virtual string GetDescription ()
         {
             return "";
+        }
+
+        protected virtual void NullCheck (System.Object obj, string name)
+        {
+            if (obj == null)
+                NullWarning (name);
+        }
+
+        protected virtual void NullWarning (string name)
+        {
+            Debug.LogWarning ("[" + this.GetType ().FullName + "] " + name + " == null");
         }
     }
 }

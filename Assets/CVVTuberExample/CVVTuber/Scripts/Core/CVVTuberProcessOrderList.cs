@@ -4,10 +4,11 @@ using UnityEngine;
 
 namespace CVVTuber
 {
+    [DisallowMultipleComponent]
     public class CVVTuberProcessOrderList : MonoBehaviour
     {
         [SerializeField]
-        List<CVVTuberProcess> processOrderList;
+        List<CVVTuberProcess> processOrderList = default(List<CVVTuberProcess>);
 
         public List<CVVTuberProcess> GetProcessOrderList ()
         {

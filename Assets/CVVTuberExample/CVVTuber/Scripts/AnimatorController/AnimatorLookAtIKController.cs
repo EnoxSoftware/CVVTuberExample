@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace CVVTuber
 {
-    public class LookAtIKController : MonoBehaviour
+    public class AnimatorLookAtIKController : MonoBehaviour
     {
         public Animator animator;
+
         public Transform looktAtTarget;
 
         [Range (0, 1.0f)]
@@ -24,7 +25,7 @@ namespace CVVTuber
         [Range (0, 1.0f)]
         public float clampWeight = 0.0f;
 
-        void Start ()
+        protected virtual void Start ()
         {
             this.animator = GetComponent<Animator> ();
         }

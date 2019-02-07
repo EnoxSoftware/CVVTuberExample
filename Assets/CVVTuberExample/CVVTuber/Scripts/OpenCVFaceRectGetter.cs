@@ -10,13 +10,30 @@ using Rect = OpenCVForUnity.CoreModule.Rect;
 
 namespace CVVTuber
 {
-    public class OpenCVFaceRectGetter : CVVTuberProcess
+    public class OpenCVFaceRectGetter : CVVTuberProcess, IFaceRectGetter
     {
+        [Header ("[Input]")]
+
+        [SerializeField, InterfaceRestriction (typeof(IMatSourceGetter))]
+        protected CVVTuberProcess matSourceGetter;
+
+        protected IMatSourceGetter _matSourceGetterInterface = null;
+
+        protected IMatSourceGetter matSourceGetterInterface {
+            get {
+                if (matSourceGetter != null && _matSourceGetterInterface == null)
+                    _matSourceGetterInterface = matSourceGetter.GetComponent<IMatSourceGetter> ();
+                return _matSourceGetterInterface;
+            }
+        }
+
+        [Header ("[Setting]")]
+
         public string openCVCascadeFileName;
 
-        public MatSourceGetter matSourceGetter;
+        public bool useDownScaleMat;
 
-        [Header ("Debug")]
+        [Header ("[Debug]")]
 
         public RawImage screen;
 
@@ -24,44 +41,32 @@ namespace CVVTuber
 
         public bool hideImage;
 
-        Mat debugMat;
+        protected Mat debugMat;
 
-        Texture2D debugTexture;
+        protected Texture2D debugTexture;
 
-        Color32[] debugColors;
+        protected Color32[] debugColors;
 
-        UnityEngine.Rect faceRect;
+        protected UnityEngine.Rect faceRect;
 
-        bool didUpdateFaceRect;
+        protected bool didUpdateFaceRect;
 
-        /// <summary>
-        /// The gray mat.
-        /// </summary>
-        Mat grayMat;
+        protected Mat grayMat;
 
-        /// <summary>
-        /// The cascade.
-        /// </summary>
-        CascadeClassifier cascade;
+        protected CascadeClassifier cascade;
 
-        /// <summary>
-        /// The faces.
-        /// </summary>
-        MatOfRect faces;
+        protected MatOfRect faces;
 
-        /// <summary>
-        /// The preset cascade file name.
-        /// </summary>
-        string openCVCascadeFileNamePreset = "haarcascade_frontalface_alt.xml";
+        protected static readonly string OPENCV_CASCADE_FILENAME_PRESET = "haarcascade_frontalface_alt.xml";
 
-        /// <summary>
-        /// The dlib shape predictor file path.
-        /// </summary>
-        string openCVCascadeFilePath;
+        protected string openCVCascadeFilePath;
 
         #if UNITY_WEBGL && !UNITY_EDITOR
-        IEnumerator getFilePath_Coroutine;
+        protected IEnumerator getFilePath_Coroutine;
         #endif
+
+
+        #region CVVTuberProcess
 
         public override string GetDescription ()
         {
@@ -70,37 +75,24 @@ namespace CVVTuber
 
         public override void Setup ()
         {
+
+            NullCheck (matSourceGetterInterface, "matSourceGetter");
+
             if (string.IsNullOrEmpty (openCVCascadeFileName))
-                openCVCascadeFileName = openCVCascadeFileNamePreset;
+                openCVCascadeFileName = OPENCV_CASCADE_FILENAME_PRESET;
 
             #if UNITY_WEBGL && !UNITY_EDITOR
-            getFilePathAsync_Coroutine = OpenCVForUnity.UnityUtils.Utils.getFilePathAsync (openCVCascadeFileName, (result) => {
+            getFilePath_Coroutine = OpenCVForUnity.UnityUtils.Utils.getFilePathAsync (openCVCascadeFileName, (result) => {
                 getFilePath_Coroutine = null;
 
                 openCVCascadeFilePath = result;
                 Run ();
             });
-            StartCoroutine (getFilePathAsync_Coroutine);
+            StartCoroutine (getFilePath_Coroutine);
             #else
             openCVCascadeFilePath = OpenCVForUnity.UnityUtils.Utils.getFilePath (openCVCascadeFileName);
             Run ();
             #endif
-        }
-
-        protected virtual void Run ()
-        {
-            cascade = new CascadeClassifier ();
-            cascade.load (openCVCascadeFilePath);
-            #if !UNITY_WSA_10_0
-            if (cascade.empty ()) {
-                Debug.LogError ("cascade file is not loaded.Please copy from “OpenCVForUnity/StreamingAssets/” to “Assets/StreamingAssets/” folder. ");
-            }
-            #endif
-
-            grayMat = new Mat ();
-            faces = new MatOfRect ();
-
-            didUpdateFaceRect = false;
         }
 
         public override void UpdateValue ()
@@ -108,12 +100,12 @@ namespace CVVTuber
             if (cascade == null)
                 return;
 
-            if (matSourceGetter == null)
+            if (matSourceGetterInterface == null)
                 return;
 
             didUpdateFaceRect = false;
 
-            Mat rgbaMat = matSourceGetter.GetMatSource ();
+            Mat rgbaMat = (useDownScaleMat) ? matSourceGetterInterface.GetDownScaleMatSource () : matSourceGetterInterface.GetMatSource ();
             if (rgbaMat != null) {
                 if (isDebugMode && screen != null) {
 
@@ -164,18 +156,30 @@ namespace CVVTuber
                 for (int i = 0; i < rects.Length; i++) {
                     if (i == 0) {
 
-                        faceRect = new UnityEngine.Rect (rects [i].x, rects [i].y, rects [i].width, rects [i].height);
+                        Rect r = rects [i];
+                        if (useDownScaleMat) {
+                            // restore to original size rect
+                            float downscaleRatio = matSourceGetterInterface.GetDownScaleRatio ();
+                            faceRect = new UnityEngine.Rect (
+                                r.x * downscaleRatio,
+                                r.y * downscaleRatio,
+                                r.width * downscaleRatio,
+                                r.height * downscaleRatio
+                            );
+                        } else {
+                            faceRect = new UnityEngine.Rect (r.x, r.y, r.width, r.height);
+                        }
 
                         didUpdateFaceRect = true;
 
                         //Debug.Log ("detect faces " + rects [i]);
 
                         if (isDebugMode && screen != null)
-                            Imgproc.rectangle (debugMat, new Point (rects [i].x, rects [i].y), new Point (rects [i].x + rects [i].width, rects [i].y + rects [i].height), new Scalar (255, 0, 0, 255), 2);
+                            Imgproc.rectangle (debugMat, new Point (r.x, r.y), new Point (r.x + r.width, r.y + r.height), new Scalar (255, 0, 0, 255), 2);
                     }
                 }
 
-//                Imgproc.putText (debugMat, "W:" + debugMat.width () + " H:" + debugMat.height () + " SO:" + Screen.orientation, new Point (5, debugMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+                //Imgproc.putText (debugMat, "W:" + debugMat.width () + " H:" + debugMat.height () + " SO:" + Screen.orientation, new Point (5, debugMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
 
                 if (isDebugMode && screen != null) {
                     OpenCVForUnity.UnityUtils.Utils.matToTexture2D (debugMat, debugTexture, debugColors);
@@ -211,6 +215,28 @@ namespace CVVTuber
             #endif
         }
 
+        #endregion
+
+
+        protected virtual void Run ()
+        {
+            cascade = new CascadeClassifier ();
+            cascade.load (openCVCascadeFilePath);
+            #if !UNITY_WSA_10_0
+            if (cascade.empty ()) {
+                Debug.LogError ("cascade file is not loaded. Please copy from “OpenCVForUnity/StreamingAssets/” to “Assets/StreamingAssets/” folder. ");
+            }
+            #endif
+
+            grayMat = new Mat ();
+            faces = new MatOfRect ();
+
+            didUpdateFaceRect = false;
+        }
+
+
+        #region IFaceRectGetter
+
         public virtual UnityEngine.Rect GetFaceRect ()
         {
             if (didUpdateFaceRect) {
@@ -223,5 +249,7 @@ namespace CVVTuber
                 #endif
             }
         }
+
+        #endregion
     }
 }

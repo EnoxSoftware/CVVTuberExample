@@ -8,17 +8,17 @@ namespace CVVTuber
     public class CameraTouchController : MonoBehaviour
     {
         [SerializeField, Range (0.0f, 1.0f)]
-        private float moveSpeed = 0.01f;
+        protected float moveSpeed = 0.01f;
 
         [SerializeField, Range (0.0f, 1.0f)]
-        private float rotateSpeed = 0.3f;
+        protected float rotateSpeed = 0.3f;
 
         [SerializeField, Range (0.0f, 1.0f)]
-        private float zoomSpeed = 0.03f;
+        protected float zoomSpeed = 0.03f;
 
-        private Vector3 preMousePos;
+        protected Vector3 preMousePos;
 
-        void Update ()
+        protected virtual void Update ()
         {
             #if ((UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR)
             TouchUpdate ();
@@ -27,7 +27,7 @@ namespace CVVTuber
             #endif
         }
 
-        private void TouchUpdate ()
+        protected virtual void TouchUpdate ()
         {
             if (Input.touchCount > 0 && Input.GetTouch (0).phase == TouchPhase.Moved) {
                 if (EventSystem.current != null) {
@@ -79,7 +79,7 @@ namespace CVVTuber
             }
         }
 
-        private void MouseUpdate ()
+        protected virtual void MouseUpdate ()
         {
             float scrollWheel = Input.GetAxis ("Mouse ScrollWheel");
             if (scrollWheel != 0.0f)
@@ -91,7 +91,7 @@ namespace CVVTuber
             MouseDrag (Input.mousePosition);
         }
 
-        private void MouseWheel (float delta)
+        protected virtual void MouseWheel (float delta)
         {
             //zoom
             this.transform.localPosition += new Vector3 (0, 0, delta * zoomSpeed * 10);
@@ -104,7 +104,7 @@ namespace CVVTuber
             }
         }
 
-        private void MouseDrag (Vector3 mousePos)
+        protected virtual void MouseDrag (Vector3 mousePos)
         {
 
             Vector3 diff = mousePos - preMousePos;

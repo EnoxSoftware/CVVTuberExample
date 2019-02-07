@@ -9,17 +9,43 @@ using OpenCVForUnity.ImgprocModule;
 
 namespace CVVTuber
 {
-    public class DlibFaceLandmarkGetter : CVVTuberProcess
+    public class DlibFaceLandmarkGetter : CVVTuberProcess, IFaceLandmarkGetter
     {
+        [Header ("[Input]")]
+
+        [SerializeField, InterfaceRestriction (typeof(IMatSourceGetter))]
+        protected CVVTuberProcess matSourceGetter;
+        
+        protected IMatSourceGetter _matSourceGetterInterface = null;
+
+        protected IMatSourceGetter matSourceGetterInterface {
+            get {
+                if (matSourceGetter != null && _matSourceGetterInterface == null)
+                    _matSourceGetterInterface = matSourceGetter.GetComponent<IMatSourceGetter> ();
+                return _matSourceGetterInterface;
+            }
+        }
+
+        [SerializeField, InterfaceRestriction (typeof(IFaceRectGetter))]
+        protected CVVTuberProcess faceRectGetter;
+
+        protected IFaceRectGetter _faceRectGetterInterface = null;
+
+        protected IFaceRectGetter faceRectGetterInterface {
+            get {
+                if (faceRectGetter != null && _faceRectGetterInterface == null)
+                    _faceRectGetterInterface = faceRectGetter.GetComponent<IFaceRectGetter> ();
+                return _faceRectGetterInterface;
+            }
+        }
+
+        [Header ("[Setting]")]
+
         public string dlibShapePredictorFileName;
 
         public string dlibShapePredictorMobileFileName;
 
-        public MatSourceGetter matSourceGetter;
-
-        public OpenCVFaceRectGetter openCVFaceRectGetter;
-
-        [Header ("Debug")]
+        [Header ("[Debug]")]
 
         public RawImage screen;
 
@@ -27,39 +53,30 @@ namespace CVVTuber
 
         public bool hideImage;
 
-        Mat debugMat;
+        protected Mat debugMat;
 
-        Texture2D debugTexture;
+        protected Texture2D debugTexture;
 
-        Color32[] debugColors;
+        protected Color32[] debugColors;
 
-        List<Vector2> faceLandmarkPoints;
+        protected List<Vector2> faceLandmarkPoints;
 
-        bool didUpdateFaceLanmarkPoints;
+        protected bool didUpdateFaceLanmarkPoints;
 
-        /// <summary>
-        /// The face landmark detector.
-        /// </summary>
-        FaceLandmarkDetector faceLandmarkDetector;
+        protected FaceLandmarkDetector faceLandmarkDetector;
 
-        /// <summary>
-        /// The preset dlib shape predictor file name.
-        /// </summary>
-        string dlibShapePredictorFileNamePreset = "sp_human_face_68.dat";
+        protected static readonly string DLIB_SHAPEPREDICTOR_FILENAME_PRESET = "sp_human_face_68.dat";
 
-        /// <summary>
-        /// The preset dlib shape predictor mobile file name.
-        /// </summary>
-        string dlibShapePredictorMobileFileNamePreset = "sp_human_face_68_for_mobile.dat";
+        protected static readonly string DLIB_SHAPEPREDICTOR_MOBILE_FILENAME_PRESET = "sp_human_face_68_for_mobile.dat";
 
-        /// <summary>
-        /// The dlib shape predictor file path.
-        /// </summary>
-        string dlibShapePredictorFilePath;
+        protected string dlibShapePredictorFilePath;
 
         #if UNITY_WEBGL && !UNITY_EDITOR
-        IEnumerator getFilePath_Coroutine;
+        protected IEnumerator getFilePath_Coroutine;
         #endif
+
+
+        #region CVVTuberProcess
 
         public override string GetDescription ()
         {
@@ -68,18 +85,22 @@ namespace CVVTuber
 
         public override void Setup ()
         {
+            NullCheck (matSourceGetterInterface, "matSourceGetter");
+
             if (string.IsNullOrEmpty (dlibShapePredictorFileName))
-                dlibShapePredictorFileName = dlibShapePredictorFileNamePreset;
+                dlibShapePredictorFileName = DLIB_SHAPEPREDICTOR_FILENAME_PRESET;
 
             if (string.IsNullOrEmpty (dlibShapePredictorMobileFileName))
-                dlibShapePredictorMobileFileName = dlibShapePredictorMobileFileNamePreset;
-
+                dlibShapePredictorMobileFileName = DLIB_SHAPEPREDICTOR_MOBILE_FILENAME_PRESET;
 
             #if UNITY_WEBGL && !UNITY_EDITOR
             getFilePath_Coroutine = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePathAsync (dlibShapePredictorMobileFileName, (result) => {
                 getFilePath_Coroutine = null;
 
                 dlibShapePredictorFilePath = result;
+                if (string.IsNullOrEmpty(dlibShapePredictorFilePath)) {
+                    Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/” to “Assets/StreamingAssets/” folder. ");
+                }
                 Run ();
             });
             StartCoroutine (getFilePath_Coroutine);
@@ -89,15 +110,11 @@ namespace CVVTuber
             #else
             dlibShapePredictorFilePath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath (dlibShapePredictorFileName);
             #endif
+            if (string.IsNullOrEmpty (dlibShapePredictorFilePath)) {
+                Debug.LogError ("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/” to “Assets/StreamingAssets/” folder. ");
+            }
             Run ();
             #endif
-        }
-
-        protected virtual void Run ()
-        {
-            faceLandmarkDetector = new FaceLandmarkDetector (dlibShapePredictorFilePath);
-
-            didUpdateFaceLanmarkPoints = false;
         }
 
         public override void UpdateValue ()
@@ -105,12 +122,13 @@ namespace CVVTuber
             if (faceLandmarkDetector == null)
                 return;
 
-            if (matSourceGetter == null)
+            if (matSourceGetterInterface == null)
                 return;
 
             didUpdateFaceLanmarkPoints = false;
 
-            Mat rgbaMat = matSourceGetter.GetMatSource ();
+            Mat rgbaMat = matSourceGetterInterface.GetMatSource ();
+            Mat downScaleRgbaMat = matSourceGetterInterface.GetDownScaleMatSource ();
             if (rgbaMat != null) {
                 if (isDebugMode && screen != null) {
 
@@ -146,12 +164,11 @@ namespace CVVTuber
                     if (screen != null)
                         screen.enabled = false;
                 }
+                    
 
-                OpenCVForUnityUtils.SetImage (faceLandmarkDetector, rgbaMat);
+                if (faceRectGetterInterface != null) {
 
-                if (openCVFaceRectGetter != null) {
-
-                    UnityEngine.Rect faceRect = openCVFaceRectGetter.GetFaceRect ();
+                    UnityEngine.Rect faceRect = faceRectGetterInterface.GetFaceRect ();
 
                     #if UNITY_5_5_OR_NEWER
                     if (faceRect != UnityEngine.Rect.zero)
@@ -160,8 +177,13 @@ namespace CVVTuber
                     #endif
                     {
                         // correct the deviation of the detection result of the face rectangle of OpenCV and Dlib.
-                        faceRect = new UnityEngine.Rect ((float)faceRect.x, (float)faceRect.y + (float)(faceRect.height * 0.1f), (float)faceRect.width, (float)faceRect.height);
+                        faceRect = new UnityEngine.Rect (
+                            faceRect.x + (faceRect.width * 0.05f),
+                            faceRect.y + (faceRect.height * 0.1f),
+                            faceRect.width * 0.9f,
+                            faceRect.height * 0.9f);
 
+                        OpenCVForUnityUtils.SetImage (faceLandmarkDetector, rgbaMat);
                         List<Vector2> points = faceLandmarkDetector.DetectLandmark (faceRect);
 
                         faceLandmarkPoints = points;
@@ -172,14 +194,26 @@ namespace CVVTuber
                             OpenCVForUnityUtils.DrawFaceLandmark (debugMat, points, new Scalar (0, 255, 0, 255), 2);
                     }
                 } else {
-
+                    
                     //detect face rects
+                    OpenCVForUnityUtils.SetImage (faceLandmarkDetector, downScaleRgbaMat);
                     List<UnityEngine.Rect> detectResult = faceLandmarkDetector.Detect ();
 
+                    OpenCVForUnityUtils.SetImage (faceLandmarkDetector, rgbaMat);
                     if (detectResult.Count > 0) {
 
-                        //detect landmark points
-                        List<Vector2> points = faceLandmarkDetector.DetectLandmark (detectResult [0]);
+                        // restore to original size rect
+                        UnityEngine.Rect r = detectResult [0];
+                        float downscaleRatio = matSourceGetterInterface.GetDownScaleRatio ();
+                        UnityEngine.Rect rect = new UnityEngine.Rect (
+                                                    r.x * downscaleRatio,
+                                                    r.y * downscaleRatio,
+                                                    r.width * downscaleRatio,
+                                                    r.height * downscaleRatio
+                                                );
+
+                        // detect landmark points
+                        List<Vector2> points = faceLandmarkDetector.DetectLandmark (rect);
 
                         faceLandmarkPoints = points;
 
@@ -190,7 +224,7 @@ namespace CVVTuber
                     }
                 }
 
-//                Imgproc.putText (debugMat, "W:" + debugMat.width () + " H:" + debugMat.height () + " SO:" + Screen.orientation, new Point (5, debugMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+                //Imgproc.putText (debugMat, "W:" + debugMat.width () + " H:" + debugMat.height () + " SO:" + Screen.orientation, new Point (5, debugMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
 
                 if (isDebugMode && screen != null) {
                     OpenCVForUnity.UnityUtils.Utils.matToTexture2D (debugMat, debugTexture, debugColors);
@@ -221,7 +255,20 @@ namespace CVVTuber
             #endif
         }
 
-        public virtual List<Vector2> getFaceLanmarkPoints ()
+        #endregion
+
+
+        protected virtual void Run ()
+        {
+            faceLandmarkDetector = new FaceLandmarkDetector (dlibShapePredictorFilePath);
+
+            didUpdateFaceLanmarkPoints = false;
+        }
+
+
+        #region IFaceLandmarkGetter
+
+        public virtual List<Vector2> GetFaceLanmarkPoints ()
         {
             if (didUpdateFaceLanmarkPoints) {
                 return faceLandmarkPoints;
@@ -229,5 +276,7 @@ namespace CVVTuber
                 return null;
             }
         }
+
+        #endregion
     }
 }
