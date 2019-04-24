@@ -26,6 +26,7 @@ namespace CVVTuber
                         layer.iKPass = true;
                     }
                 }
+                EditorUtility.SetDirty (animCon);
 
                 HeadLookAtIKController headLookAtIKController = FindObjectOfType<HeadLookAtIKController> ();
                 if (headLookAtIKController != null) {
@@ -40,18 +41,24 @@ namespace CVVTuber
                             headLookAtIKController.lookAtTarget = lookAtTarget;
                         }
                     }
+
+                    EditorUtility.SetDirty (headLookAtIKController);
                 }
 
                 HeadRotationController headRotationController = FindObjectOfType<HeadRotationController> ();
                 Undo.RecordObject (headRotationController, "Set head.transform to headRotationController.target");
                 if (headRotationController != null) {
                     headRotationController.target = cVVTuberModel.transform.Find ("Character001/hips/spine/chest/upper_chest/neck/head").transform;
+
+                    EditorUtility.SetDirty (headRotationController);
                 }
 
                 FaceBlendShapeController faceBlendShapeController = FindObjectOfType<FaceBlendShapeController> ();
                 if (faceBlendShapeController != null) {
                     Undo.RecordObject (faceBlendShapeController, "Set SkinnedMeshRenderer to faceBlendShapeController.FACE_DEF");
                     faceBlendShapeController.FACE_DEF = cVVTuberModel.transform.Find ("FACE_DEF").GetComponent<SkinnedMeshRenderer> ();
+
+                    EditorUtility.SetDirty (faceBlendShapeController);
                 }
 
             } else {

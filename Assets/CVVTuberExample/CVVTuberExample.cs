@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using OpenCVForUnity.CoreModule;
+using System.Collections.Generic;
 
 namespace CVVTuberExample
 {
@@ -116,6 +117,11 @@ namespace CVVTuberExample
         public void OnLive2DCubism2CVVTuberExampleButtonClick ()
         {
             SceneManager.LoadScene ("Live2DCubism2CVVTuberExample");
+        }
+
+        public void OnLive2DCubism3CVVTuberExampleButtonClick ()
+        {
+            SceneManager.LoadScene ("Live2DCubism3CVVTuberExample");
         }
 
         public void OnVRMCVVTuberExampleButtonClick ()
