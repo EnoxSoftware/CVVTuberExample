@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace CVVTuber
 {
@@ -10,76 +7,76 @@ namespace CVVTuber
         public bool callInUnityLifeCycle;
 
         // Use this for initialization
-        protected virtual void Start ()
+        protected virtual void Start()
         {
             if (callInUnityLifeCycle)
-                Setup ();
+                Setup();
         }
 
-        protected virtual void FixedUpdate ()
+        protected virtual void FixedUpdate()
         {
             if (callInUnityLifeCycle)
-                FixedUpdateValue ();
+                FixedUpdateValue();
         }
 
         // Update is called once per frame
-        protected virtual void Update ()
+        protected virtual void Update()
         {
             if (callInUnityLifeCycle)
-                UpdateValue ();
+                UpdateValue();
         }
 
         // Update is called once per frame
-        protected virtual void LateUpdate ()
+        protected virtual void LateUpdate()
         {
             if (callInUnityLifeCycle)
-                LateUpdateValue ();
+                LateUpdateValue();
         }
 
-        protected virtual void OnDestroy ()
+        protected virtual void OnDestroy()
         {
-            Dispose ();
+            Dispose();
         }
 
-        public virtual void Setup ()
-        {
-
-        }
-
-        public virtual void FixedUpdateValue ()
+        public virtual void Setup()
         {
 
         }
 
-        public virtual void UpdateValue ()
+        public virtual void FixedUpdateValue()
         {
 
         }
 
-        public virtual void LateUpdateValue ()
+        public virtual void UpdateValue()
         {
 
         }
 
-        public virtual void Dispose ()
+        public virtual void LateUpdateValue()
         {
 
         }
 
-        public virtual string GetDescription ()
+        public virtual void Dispose()
+        {
+
+        }
+
+        public virtual string GetDescription()
         {
             return "";
         }
 
-        protected virtual void NullCheck (System.Object obj, string name)
+        protected virtual void NullCheck(System.Object obj, string name)
         {
             if (obj == null)
-                NullWarning (name);
+                NullWarning(name);
         }
 
-        protected virtual void NullWarning (string name)
+        protected virtual void NullWarning(string name)
         {
-            Debug.LogWarning ("[" + this.GetType ().FullName + "] " + name + " == null");
+            Debug.LogWarning("[" + this.GetType().FullName + "] " + name + " == null");
         }
     }
 }

@@ -4,6 +4,6 @@ namespace CVVTuber
 {
     public interface IHeadPositionGetter
     {
-        Vector3 GetHeadPosition ();
+        Vector3 GetHeadPosition();
     }
 }

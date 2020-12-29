@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
 
 namespace CVVTuberExample
 {
@@ -10,23 +9,23 @@ namespace CVVTuberExample
     public class ShowOpenCVLicense : MonoBehaviour
     {
         // Use this for initialization
-        void Start ()
+        void Start()
         {
-    
+
         }
-    
+
         // Update is called once per frame
-        void Update ()
+        void Update()
         {
-    
+
         }
 
         /// <summary>
         /// Raises the back button click event.
         /// </summary>
-        public void OnBackButtonClick ()
+        public void OnBackButtonClick()
         {
-            SceneManager.LoadScene ("CVVTuberExample");
+            SceneManager.LoadScene("CVVTuberExample");
         }
     }
 }

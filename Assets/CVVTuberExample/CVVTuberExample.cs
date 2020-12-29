@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+﻿using OpenCVForUnity.CoreModule;
 using UnityEngine;
-using OpenCVForUnity.CoreModule;
-using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace CVVTuberExample
 {
@@ -29,47 +27,49 @@ namespace CVVTuberExample
 
         static DlibShapePredictorNamePreset dlibShapePredictorName = DlibShapePredictorNamePreset.sp_human_face_68;
 
-        public static string dlibShapePredictorFileName {
-            get {
-                return dlibShapePredictorName.ToString () + ".dat";
+        public static string dlibShapePredictorFileName
+        {
+            get
+            {
+                return dlibShapePredictorName.ToString() + ".dat";
             }
         }
 
         // Use this for initialization
-        void Start ()
+        void Start()
         {
             exampleTitle.text = "CV VTuber Example " + Application.version;
 
-            versionInfo.text = Core.NATIVE_LIBRARY_NAME + " " + OpenCVForUnity.UnityUtils.Utils.getVersion () + " (" + Core.VERSION + ")";
-            versionInfo.text += " / dlibfacelandmarkdetector" + " " + DlibFaceLandmarkDetector.UnityUtils.Utils.getVersion ();
+            versionInfo.text = Core.NATIVE_LIBRARY_NAME + " " + OpenCVForUnity.UnityUtils.Utils.getVersion() + " (" + Core.VERSION + ")";
+            versionInfo.text += " / dlibfacelandmarkdetector" + " " + DlibFaceLandmarkDetector.UnityUtils.Utils.getVersion();
             versionInfo.text += " / UnityEditor " + Application.unityVersion;
             versionInfo.text += " / ";
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             versionInfo.text += "Editor";
-            #elif UNITY_STANDALONE_WIN
+#elif UNITY_STANDALONE_WIN
             versionInfo.text += "Windows";
-            #elif UNITY_STANDALONE_OSX
+#elif UNITY_STANDALONE_OSX
             versionInfo.text += "Mac OSX";
-            #elif UNITY_STANDALONE_LINUX
+#elif UNITY_STANDALONE_LINUX
             versionInfo.text += "Linux";
-            #elif UNITY_ANDROID
+#elif UNITY_ANDROID
             versionInfo.text += "Android";
-            #elif UNITY_IOS
+#elif UNITY_IOS
             versionInfo.text += "iOS";
-            #elif UNITY_WSA
+#elif UNITY_WSA
             versionInfo.text += "WSA";
-            #elif UNITY_WEBGL
+#elif UNITY_WEBGL
             versionInfo.text += "WebGL";
-            #endif
+#endif
             versionInfo.text += " ";
-            #if ENABLE_MONO
+#if ENABLE_MONO
             versionInfo.text += "Mono";
-            #elif ENABLE_IL2CPP
+#elif ENABLE_IL2CPP
             versionInfo.text += "IL2CPP";
-            #elif ENABLE_DOTNET
+#elif ENABLE_DOTNET
             versionInfo.text += ".NET";
-            #endif
+#endif
 
             scrollRect.verticalNormalizedPosition = verticalNormalizedPosition;
 
@@ -77,60 +77,55 @@ namespace CVVTuberExample
         }
 
         // Update is called once per frame
-        void Update ()
+        void Update()
         {
 
         }
 
-        public void OnScrollRectValueChanged ()
+        public void OnScrollRectValueChanged()
         {
             verticalNormalizedPosition = scrollRect.verticalNormalizedPosition;
         }
 
 
-        public void OnShowOpenCVLicenseButtonClick ()
+        public void OnShowOpenCVLicenseButtonClick()
         {
-            SceneManager.LoadScene ("ShowOpenCVLicense");
+            SceneManager.LoadScene("ShowOpenCVLicense");
         }
 
-        public void OnWebCamTextureCVVTuberExampleButtonClick ()
+        public void OnWebCamTextureCVVTuberExampleButtonClick()
         {
-            SceneManager.LoadScene ("WebCamTextureCVVTuberExample");
+            SceneManager.LoadScene("WebCamTextureCVVTuberExample");
         }
 
-        public void OnVideoCaptureCVVTuberExampleButtonClick ()
+        public void OnVideoCaptureCVVTuberExampleButtonClick()
         {
-            SceneManager.LoadScene ("VideoCaptureCVVTuberExample");
-        }
-
-
-        public void OnShowUnityChanLicenseButtonClick ()
-        {
-            SceneManager.LoadScene ("ShowUnityChanLicense");
-        }
-
-        public void OnUnityChanCVVTuberExampleButtonClick ()
-        {
-            SceneManager.LoadScene ("UnityChanCVVTuberExample");
-        }
-
-        public void OnLive2DCubism2CVVTuberExampleButtonClick ()
-        {
-            SceneManager.LoadScene ("Live2DCubism2CVVTuberExample");
-        }
-
-        public void OnLive2DCubism3CVVTuberExampleButtonClick ()
-        {
-            SceneManager.LoadScene ("Live2DCubism3CVVTuberExample");
-        }
-
-        public void OnVRMCVVTuberExampleButtonClick ()
-        {
-            SceneManager.LoadScene ("VRMCVVTuberExample");
+            SceneManager.LoadScene("VideoCaptureCVVTuberExample");
         }
 
 
-        public void OnDlibShapePredictorNameDropdownValueChanged (int result)
+        public void OnShowUnityChanLicenseButtonClick()
+        {
+            SceneManager.LoadScene("ShowUnityChanLicense");
+        }
+
+        public void OnUnityChanCVVTuberExampleButtonClick()
+        {
+            SceneManager.LoadScene("UnityChanCVVTuberExample");
+        }
+
+        public void OnLive2DCubism4CVVTuberExampleButtonClick()
+        {
+            SceneManager.LoadScene("Live2DCubism4CVVTuberExample");
+        }
+
+        public void OnVRMCVVTuberExampleButtonClick()
+        {
+            SceneManager.LoadScene("VRMCVVTuberExample");
+        }
+
+
+        public void OnDlibShapePredictorNameDropdownValueChanged(int result)
         {
             dlibShapePredictorName = (DlibShapePredictorNamePreset)result;
         }

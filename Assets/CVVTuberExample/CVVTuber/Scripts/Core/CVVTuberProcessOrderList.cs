@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace CVVTuber
@@ -10,7 +9,7 @@ namespace CVVTuber
         [SerializeField]
         List<CVVTuberProcess> processOrderList = default(List<CVVTuberProcess>);
 
-        public List<CVVTuberProcess> GetProcessOrderList ()
+        public List<CVVTuberProcess> GetProcessOrderList()
         {
             return processOrderList;
         }

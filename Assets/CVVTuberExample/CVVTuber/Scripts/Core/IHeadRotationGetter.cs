@@ -4,8 +4,8 @@ namespace CVVTuber
 {
     public interface IHeadRotationGetter
     {
-        Quaternion GetHeadRotation ();
+        Quaternion GetHeadRotation();
 
-        Vector3 GetHeadEulerAngles ();
+        Vector3 GetHeadEulerAngles();
     }
 }

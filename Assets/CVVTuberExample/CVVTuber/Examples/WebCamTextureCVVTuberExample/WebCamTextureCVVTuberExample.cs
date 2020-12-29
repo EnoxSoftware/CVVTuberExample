@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+﻿using CVVTuber;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
-using CVVTuber;
 
 namespace CVVTuberExample
 {
@@ -18,7 +17,7 @@ namespace CVVTuberExample
         public DlibFaceLandmarkGetter dlibFaceLandmarkGetter;
 
         // Use this for initialization
-        void Start ()
+        void Start()
         {
             // Load global settings.
             dlibFaceLandmarkGetter.dlibShapePredictorFileName = CVVTuberExample.dlibShapePredictorFileName;
@@ -28,17 +27,17 @@ namespace CVVTuberExample
         /// <summary>
         /// Raises the back button click event.
         /// </summary>
-        public void OnBackButtonClick ()
+        public void OnBackButtonClick()
         {
-            SceneManager.LoadScene ("CVVTuberExample");
+            SceneManager.LoadScene("CVVTuberExample");
         }
 
         /// <summary>
         /// Raises the change camera button click event.
         /// </summary>
-        public void OnChangeCameraButtonClick ()
+        public void OnChangeCameraButtonClick()
         {
-            webCamTextureMatSourceGetter.ChangeCamera ();
+            webCamTextureMatSourceGetter.ChangeCamera();
         }
     }
 }
