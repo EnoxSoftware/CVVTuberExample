@@ -1,4 +1,4 @@
-﻿
+
 namespace CVVTuber
 {
     public interface IFaceRectGetter

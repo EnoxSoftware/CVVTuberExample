@@ -1,4 +1,4 @@
-﻿using DlibFaceLandmarkDetector;
+using DlibFaceLandmarkDetector;
 using OpenCVForUnity.CoreModule;
 using OpenCVForUnity.ImgprocModule;
 using System;

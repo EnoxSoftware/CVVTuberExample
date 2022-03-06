@@ -1,4 +1,4 @@
-﻿using CVVTuber;
+using CVVTuber;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

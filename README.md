@@ -20,7 +20,7 @@ Demo
 - WebGL
 <https://enoxsoftware.github.io/CVVTuberExample/webgl_example/index.html>
 - Android
-<https://play.google.com/store/apps/details?id=com.enoxsoftware.cvvtuberexample>
+<https://github.com/EnoxSoftware/CVVTuberExample/releases>
 
 Manual
 -----
