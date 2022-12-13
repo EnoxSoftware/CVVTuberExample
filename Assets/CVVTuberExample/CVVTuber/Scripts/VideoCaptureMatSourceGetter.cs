@@ -14,7 +14,7 @@ namespace CVVTuber
     {
         [Header("[Setting]")]
 
-        public string videoFileName = "dance_mjpeg.mjpeg";
+        public string videoFileName = "DlibFaceLandmarkDetector/dance_mjpeg.mjpeg";
 
         protected ImageOptimizationHelper imageOptimizationHelper;
 

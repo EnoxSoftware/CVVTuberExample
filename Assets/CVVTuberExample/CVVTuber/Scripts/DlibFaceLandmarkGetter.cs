@@ -69,9 +69,9 @@ namespace CVVTuber
 
         protected FaceLandmarkDetector faceLandmarkDetector;
 
-        protected static readonly string DLIB_SHAPEPREDICTOR_FILENAME_PRESET = "sp_human_face_68.dat";
+        protected static readonly string DLIB_SHAPEPREDICTOR_FILENAME_PRESET = "DlibFaceLandmarkDetector/sp_human_face_68.dat";
 
-        protected static readonly string DLIB_SHAPEPREDICTOR_MOBILE_FILENAME_PRESET = "sp_human_face_68_for_mobile.dat";
+        protected static readonly string DLIB_SHAPEPREDICTOR_MOBILE_FILENAME_PRESET = "DlibFaceLandmarkDetector/sp_human_face_68_for_mobile.dat";
 
         protected string dlibShapePredictorFilePath;
 
@@ -105,7 +105,7 @@ namespace CVVTuber
                 dlibShapePredictorFilePath = result;
                 if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
                 {
-                    Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/” to “Assets/StreamingAssets/” folder. ");
+                    Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
                 }
                 Run();
             });
@@ -118,7 +118,7 @@ namespace CVVTuber
 #endif
             if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
             {
-                Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/” to “Assets/StreamingAssets/” folder. ");
+                Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
             }
             Run();
 #endif

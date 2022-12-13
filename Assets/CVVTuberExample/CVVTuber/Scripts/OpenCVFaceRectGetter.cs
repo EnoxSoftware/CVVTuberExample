@@ -58,7 +58,7 @@ namespace CVVTuber
 
         protected MatOfRect faces;
 
-        protected static readonly string OPENCV_CASCADE_FILENAME_PRESET = "haarcascade_frontalface_alt.xml";
+        protected static readonly string OPENCV_CASCADE_FILENAME_PRESET = "DlibFaceLandmarkDetector/haarcascade_frontalface_alt.xml";
 
         protected string openCVCascadeFilePath;
 
@@ -248,7 +248,7 @@ namespace CVVTuber
 #if !UNITY_WSA_10_0
             if (cascade.empty())
             {
-                Debug.LogError("cascade file is not loaded. Please copy from “OpenCVForUnity/StreamingAssets/” to “Assets/StreamingAssets/” folder. ");
+                Debug.LogError("cascade file is not loaded. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
             }
 #endif
 
