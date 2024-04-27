@@ -17,10 +17,8 @@ Demo Video
 
 Demo
 -----
-- WebGL
-<https://enoxsoftware.github.io/CVVTuberExample/webgl_example/index.html>
-- Android
-<https://github.com/EnoxSoftware/CVVTuberExample/releases>
+- WebGL (simd) <https://enoxsoftware.github.io/CVVTuberExample/webgl_example/index.html>
+- Android <https://github.com/EnoxSoftware/CVVTuberExample/releases>
 
 Manual
 -----
