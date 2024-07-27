@@ -14,7 +14,8 @@ namespace CVVTuber
     {
         [Header("[Setting]")]
 
-        public string videoFileName = "DlibFaceLandmarkDetector/dance_mjpeg.mjpeg";
+        [Tooltip("Set the video file path, relative to the starting point of the \"StreamingAssets\" folder, or absolute path.")]
+        public string videoFilePath = "DlibFaceLandmarkDetector/dance_mjpeg.mjpeg";
 
         protected ImageOptimizationHelper imageOptimizationHelper;
 
@@ -28,7 +29,7 @@ namespace CVVTuber
 
         protected bool didUpdateResultMat;
 
-        protected string videoFilePath;
+        protected string videoFileFullPath;
 
         protected bool shouldUpdateVideoFrame;
 
@@ -50,13 +51,22 @@ namespace CVVTuber
         {
             imageOptimizationHelper = gameObject.GetComponent<ImageOptimizationHelper>();
 
+            Uri uri;
+            if (Uri.TryCreate(videoFilePath, UriKind.Absolute, out uri))
+            {
+                videoFileFullPath = uri.OriginalString;
+                Run();
+            }
+            else
+            {
 #if UNITY_WEBGL
-            getFilePath_Coroutine = GetFilePath();
-            StartCoroutine(getFilePath_Coroutine);
+                getFilePath_Coroutine = GetFilePath();
+                StartCoroutine(getFilePath_Coroutine);
 #else
-            videoFilePath = OpenCVForUnity.UnityUtils.Utils.getFilePath(videoFileName);
-            Run();
+                videoFileFullPath = OpenCVForUnity.UnityUtils.Utils.getFilePath(videoFilePath);
+                Run();
 #endif
+            }
 
             didUpdateResultMat = false;
         }
@@ -126,9 +136,9 @@ namespace CVVTuber
 #if UNITY_WEBGL
         protected virtual IEnumerator GetFilePath()
         {
-            var getFilePathAsync_Coroutine = OpenCVForUnity.UnityUtils.Utils.getFilePathAsync(videoFileName, (result) =>
+            var getFilePathAsync_Coroutine = OpenCVForUnity.UnityUtils.Utils.getFilePathAsync(videoFilePath, (result) =>
             {
-                videoFilePath = result;
+                videoFileFullPath = result;
             });
             yield return getFilePathAsync_Coroutine;
 
@@ -140,7 +150,7 @@ namespace CVVTuber
 
         protected virtual void Run()
         {
-            if (string.IsNullOrEmpty(videoFilePath))
+            if (string.IsNullOrEmpty(videoFileFullPath))
             {
                 Debug.LogError("video file does not exist.");
             }
@@ -149,7 +159,7 @@ namespace CVVTuber
             resultMat = new Mat();
 
             capture = new VideoCapture();
-            capture.open(videoFilePath);
+            capture.open(videoFileFullPath);
 
             if (!capture.isOpened())
             {

@@ -138,6 +138,7 @@ namespace CVVTuber
             invertZM = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, -1));
             //Debug.Log ("invertZM " + invertZM.ToString ());
 
+            imageWidth = imageHeight = 0;
 
             didUpdateHeadPositionAndRotation = false;
         }
@@ -341,6 +342,8 @@ namespace CVVTuber
         {
             if (didUpdateHeadPositionAndRotation)
             {
+
+
                 return headRotation.eulerAngles;
             }
             else

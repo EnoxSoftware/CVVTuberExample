@@ -82,6 +82,8 @@ namespace CVVTuber
                 {
                     NullWarning("lookAtTarget");
                 }
+
+                enabled = true;
             }
             else
             {

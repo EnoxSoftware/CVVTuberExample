@@ -1,5 +1,6 @@
 using OpenCVForUnity.CoreModule;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -95,12 +96,26 @@ namespace CVVTuberExample
 
         public void OnWebCamTextureCVVTuberExampleButtonClick()
         {
-            SceneManager.LoadScene("WebCamTextureCVVTuberExample");
+            if (GraphicsSettings.defaultRenderPipeline == null)
+            {
+                SceneManager.LoadScene("WebCamTextureCVVTuberExample_Built-in");
+            }
+            else
+            {
+                SceneManager.LoadScene("WebCamTextureCVVTuberExample_SRP");
+            }
         }
 
         public void OnVideoCaptureCVVTuberExampleButtonClick()
         {
-            SceneManager.LoadScene("VideoCaptureCVVTuberExample");
+            if (GraphicsSettings.defaultRenderPipeline == null)
+            {
+                SceneManager.LoadScene("VideoCaptureCVVTuberExample_Built-in");
+            }
+            else
+            {
+                SceneManager.LoadScene("VideoCaptureCVVTuberExample_SRP");
+            }
         }
 
 
@@ -114,9 +129,9 @@ namespace CVVTuberExample
             SceneManager.LoadScene("UnityChanCVVTuberExample");
         }
 
-        public void OnLive2DCubism4CVVTuberExampleButtonClick()
+        public void OnLive2DCubism5CVVTuberExampleButtonClick()
         {
-            SceneManager.LoadScene("Live2DCubism4CVVTuberExample");
+            SceneManager.LoadScene("Live2DCubism5CVVTuberExample");
         }
 
         public void OnVRMCVVTuberExampleButtonClick()

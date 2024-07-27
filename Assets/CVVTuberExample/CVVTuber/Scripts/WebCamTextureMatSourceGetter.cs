@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace CVVTuber
 {
-    [RequireComponent(typeof(WebCamTextureToMatHelper), typeof(ImageOptimizationHelper))]
+    [RequireComponent(typeof(WebCamTexture2MatHelper), typeof(ImageOptimizationHelper))]
     public class WebCamTextureMatSourceGetter : CVVTuberProcess, IMatSourceGetter
     {
-        protected WebCamTextureToMatHelper webCamTextureToMatHelper;
+        protected WebCamTexture2MatHelper webCamTexture2MatHelper;
 
         protected ImageOptimizationHelper imageOptimizationHelper;
 
@@ -27,10 +27,10 @@ namespace CVVTuber
 
         public override void Setup()
         {
-            webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
+            webCamTexture2MatHelper = gameObject.GetComponent<WebCamTexture2MatHelper>();
             imageOptimizationHelper = gameObject.GetComponent<ImageOptimizationHelper>();
 
-            webCamTextureToMatHelper.Initialize();
+            webCamTexture2MatHelper.Initialize();
 
             didUpdateResultMat = false;
         }
@@ -39,10 +39,10 @@ namespace CVVTuber
         {
             didUpdateResultMat = false;
 
-            if (webCamTextureToMatHelper.IsPlaying() && webCamTextureToMatHelper.DidUpdateThisFrame() && !imageOptimizationHelper.IsCurrentFrameSkipped())
+            if (webCamTexture2MatHelper.IsPlaying() && webCamTexture2MatHelper.DidUpdateThisFrame() && !imageOptimizationHelper.IsCurrentFrameSkipped())
             {
 
-                resultMat = webCamTextureToMatHelper.GetMat();
+                resultMat = webCamTexture2MatHelper.GetMat();
                 downScaleResultMat = imageOptimizationHelper.GetDownScaleMat(resultMat);
 
                 didUpdateResultMat = true;
@@ -51,8 +51,8 @@ namespace CVVTuber
 
         public override void Dispose()
         {
-            if (webCamTextureToMatHelper != null)
-                webCamTextureToMatHelper.Dispose();
+            if (webCamTexture2MatHelper != null)
+                webCamTexture2MatHelper.Dispose();
 
             if (imageOptimizationHelper != null)
                 imageOptimizationHelper.Dispose();
@@ -103,23 +103,23 @@ namespace CVVTuber
 
         public virtual void Play()
         {
-            webCamTextureToMatHelper.Play();
+            webCamTexture2MatHelper.Play();
         }
 
         public virtual void Pause()
         {
-            webCamTextureToMatHelper.Pause();
+            webCamTexture2MatHelper.Pause();
         }
 
         public virtual void Stop()
         {
-            webCamTextureToMatHelper.Stop();
+            webCamTexture2MatHelper.Stop();
         }
 
         public virtual void ChangeCamera()
         {
 #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
-            string deviceName = webCamTextureToMatHelper.GetDeviceName();
+            string deviceName = webCamTexture2MatHelper.GetDeviceName();
             int nextCameraIndex = -1;
             for (int cameraIndex = 0; cameraIndex < WebCamTexture.devices.Length; cameraIndex++)
             {
@@ -131,14 +131,14 @@ namespace CVVTuber
             }
             if (nextCameraIndex != -1)
             {
-                webCamTextureToMatHelper.requestedDeviceName = nextCameraIndex.ToString();
+                webCamTexture2MatHelper.requestedDeviceName = nextCameraIndex.ToString();
             }
             else
             {
-                webCamTextureToMatHelper.requestedIsFrontFacing = !webCamTextureToMatHelper.requestedIsFrontFacing;
+                webCamTexture2MatHelper.requestedIsFrontFacing = !webCamTexture2MatHelper.requestedIsFrontFacing;
             }
 #else
-            webCamTextureToMatHelper.requestedIsFrontFacing = !webCamTextureToMatHelper.requestedIsFrontFacing;
+            webCamTexture2MatHelper.requestedIsFrontFacing = !webCamTexture2MatHelper.requestedIsFrontFacing;
 #endif
         }
     }
