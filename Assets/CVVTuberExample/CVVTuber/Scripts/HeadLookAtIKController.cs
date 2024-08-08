@@ -68,7 +68,6 @@ namespace CVVTuber
 
             if (target != null)
             {
-
                 AnimatorLookAtIKController headLookAtIKController = target.gameObject.GetComponent<AnimatorLookAtIKController>();
 
                 if (headLookAtIKController == null)
@@ -82,13 +81,10 @@ namespace CVVTuber
                 {
                     NullWarning("lookAtTarget");
                 }
-
-                enabled = true;
             }
             else
             {
                 NullWarning("target");
-                enabled = false;
             }
 
             if (lookAtRoot != null)
@@ -103,6 +99,8 @@ namespace CVVTuber
 
         public override void UpdateValue()
         {
+            if (target == null)
+                return;
             if (headRotationGetterInterface == null)
                 return;
             if (lookAtRoot == null)

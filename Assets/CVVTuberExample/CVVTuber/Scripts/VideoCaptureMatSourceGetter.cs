@@ -49,6 +49,8 @@ namespace CVVTuber
 
         public override void Setup()
         {
+            Dispose();
+
             imageOptimizationHelper = gameObject.GetComponent<ImageOptimizationHelper>();
 
             Uri uri;
@@ -107,7 +109,10 @@ namespace CVVTuber
                 imageOptimizationHelper.Dispose();
 
             if (capture != null)
-                capture.release();
+            {
+                capture.Dispose();
+                capture = null;
+            }
 
             if (captureMat != null)
             {
@@ -152,7 +157,7 @@ namespace CVVTuber
         {
             if (string.IsNullOrEmpty(videoFileFullPath))
             {
-                Debug.LogError("video file does not exist.");
+                Debug.LogError("video file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
             }
 
             captureMat = new Mat();
@@ -163,7 +168,7 @@ namespace CVVTuber
 
             if (!capture.isOpened())
             {
-                Debug.LogError("capture.isOpened() false");
+                Debug.LogError("capture.isOpened() false " + videoFileFullPath);
             }
 
             //Debug.Log("CAP_PROP_FORMAT: " + capture.get(Videoio.CAP_PROP_FORMAT));

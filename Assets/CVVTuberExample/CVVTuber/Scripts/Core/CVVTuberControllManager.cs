@@ -20,15 +20,7 @@ namespace CVVTuber
             if (processOrderList == null)
                 yield break;
 
-            foreach (var item in processOrderList)
-            {
-                if (item == null)
-                    continue;
-
-                //Debug.Log("Setup : "+item.gameObject.name);
-
-                item.Setup();
-            }
+            SetupAllProcess();
 
             enabled = true;
         }
@@ -81,6 +73,22 @@ namespace CVVTuber
         public virtual void Dispose()
         {
 
+        }
+
+        public virtual void SetupAllProcess()
+        {
+            if (processOrderList == null)
+                return;
+
+            foreach (var item in processOrderList)
+            {
+                if (item == null)
+                    continue;
+
+                //Debug.Log("Setup : "+item.gameObject.name);
+
+                item.Setup();
+            }
         }
     }
 }

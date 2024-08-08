@@ -45,9 +45,11 @@ namespace CVVTuber
 
         [Header("[Setting]")]
 
-        public string dlibShapePredictorFileName;
+        [Tooltip("Set the shape predictor file path, relative to the starting point of the \"StreamingAssets\" folder, or absolute path.")]
+        public string dlibShapePredictorFilePath;
 
-        public string dlibShapePredictorMobileFileName;
+        [Tooltip("Set the shape predictor mobile file path, relative to the starting point of the \"StreamingAssets\" folder, or absolute path.")]
+        public string dlibShapePredictorMobileFilePath;
 
         [Header("[Debug]")]
 
@@ -69,11 +71,11 @@ namespace CVVTuber
 
         protected FaceLandmarkDetector faceLandmarkDetector;
 
-        protected static readonly string DLIB_SHAPEPREDICTOR_FILENAME_PRESET = "DlibFaceLandmarkDetector/sp_human_face_68.dat";
+        protected static readonly string DLIB_SHAPEPREDICTOR_FILEPATH_PRESET = "DlibFaceLandmarkDetector/sp_human_face_68.dat";
 
-        protected static readonly string DLIB_SHAPEPREDICTOR_MOBILE_FILENAME_PRESET = "DlibFaceLandmarkDetector/sp_human_face_68_for_mobile.dat";
+        protected static readonly string DLIB_SHAPEPREDICTOR_MOBILE_FILEPATH_PRESET = "DlibFaceLandmarkDetector/sp_human_face_68_for_mobile.dat";
 
-        protected string dlibShapePredictorFilePath;
+        protected string dlibShapePredictorFileFullPath;
 
 #if UNITY_WEBGL
         protected IEnumerator getFilePath_Coroutine;
@@ -89,37 +91,59 @@ namespace CVVTuber
 
         public override void Setup()
         {
+            Dispose();
+
             NullCheck(matSourceGetterInterface, "matSourceGetter");
 
-            if (string.IsNullOrEmpty(dlibShapePredictorFileName))
-                dlibShapePredictorFileName = DLIB_SHAPEPREDICTOR_FILENAME_PRESET;
+            if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
+                dlibShapePredictorFilePath = DLIB_SHAPEPREDICTOR_FILEPATH_PRESET;
 
-            if (string.IsNullOrEmpty(dlibShapePredictorMobileFileName))
-                dlibShapePredictorMobileFileName = DLIB_SHAPEPREDICTOR_MOBILE_FILENAME_PRESET;
+            if (string.IsNullOrEmpty(dlibShapePredictorMobileFilePath))
+                dlibShapePredictorMobileFilePath = DLIB_SHAPEPREDICTOR_MOBILE_FILEPATH_PRESET;
+
 
 #if UNITY_WEBGL
-            getFilePath_Coroutine = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePathAsync(dlibShapePredictorMobileFileName, (result) =>
+            Uri uri;
+            if (Uri.TryCreate(dlibShapePredictorMobileFilePath, UriKind.Absolute, out uri))
             {
-                getFilePath_Coroutine = null;
-
-                dlibShapePredictorFilePath = result;
-                if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
-                {
-                    Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
-                }
+                dlibShapePredictorFileFullPath = uri.OriginalString;
                 Run();
-            });
-            StartCoroutine(getFilePath_Coroutine);
-#else
-#if UNITY_ANDROID || UNITY_IOS
-            dlibShapePredictorFilePath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath(dlibShapePredictorMobileFileName);
-#else
-            dlibShapePredictorFilePath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath(dlibShapePredictorFileName);
-#endif
-            if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
-            {
-                Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
             }
+            else
+            {
+                getFilePath_Coroutine = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePathAsync(dlibShapePredictorMobileFilePath, (result) =>
+                {
+                    getFilePath_Coroutine = null;
+
+                    dlibShapePredictorFileFullPath = result;
+                    Run();
+                });
+                StartCoroutine(getFilePath_Coroutine);
+            }
+#else
+
+#if UNITY_ANDROID || UNITY_IOS
+            Uri uri;
+            if (Uri.TryCreate(dlibShapePredictorMobileFilePath, UriKind.Absolute, out uri))
+            {
+                dlibShapePredictorFileFullPath = uri.OriginalString;
+            }
+            else
+            {
+                dlibShapePredictorFileFullPath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath(dlibShapePredictorMobileFilePath);
+            }
+#else
+            Uri uri;
+            if (Uri.TryCreate(dlibShapePredictorFilePath, UriKind.Absolute, out uri))
+            {
+                dlibShapePredictorFileFullPath = uri.OriginalString;
+            }
+            else
+            {
+                dlibShapePredictorFileFullPath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath(dlibShapePredictorFilePath);
+            }
+#endif     
+
             Run();
 #endif
         }
@@ -254,7 +278,10 @@ namespace CVVTuber
         public override void Dispose()
         {
             if (faceLandmarkDetector != null)
+            {
                 faceLandmarkDetector.Dispose();
+                faceLandmarkDetector = null;
+            }
 
             if (debugMat != null)
             {
@@ -282,7 +309,12 @@ namespace CVVTuber
 
         protected virtual void Run()
         {
-            faceLandmarkDetector = new FaceLandmarkDetector(dlibShapePredictorFilePath);
+            if (string.IsNullOrEmpty(dlibShapePredictorFileFullPath))
+            {
+                Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
+            }
+
+            faceLandmarkDetector = new FaceLandmarkDetector(dlibShapePredictorFileFullPath);
 
             didUpdateFaceLanmarkPoints = false;
         }

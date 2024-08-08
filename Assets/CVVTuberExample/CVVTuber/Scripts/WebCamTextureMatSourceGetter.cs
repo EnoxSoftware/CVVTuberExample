@@ -37,6 +37,11 @@ namespace CVVTuber
 
         public override void UpdateValue()
         {
+            if (webCamTexture2MatHelper == null)
+                return;
+            if (imageOptimizationHelper == null)
+                return;
+
             didUpdateResultMat = false;
 
             if (webCamTexture2MatHelper.IsPlaying() && webCamTexture2MatHelper.DidUpdateThisFrame() && !imageOptimizationHelper.IsCurrentFrameSkipped())
@@ -95,6 +100,9 @@ namespace CVVTuber
 
         public virtual float GetDownScaleRatio()
         {
+            if (imageOptimizationHelper == null)
+                return default;
+
             return imageOptimizationHelper.downscaleRatio;
         }
 
@@ -103,21 +111,33 @@ namespace CVVTuber
 
         public virtual void Play()
         {
+            if (webCamTexture2MatHelper == null)
+                return;
+
             webCamTexture2MatHelper.Play();
         }
 
         public virtual void Pause()
         {
+            if (webCamTexture2MatHelper == null)
+                return;
+
             webCamTexture2MatHelper.Pause();
         }
 
         public virtual void Stop()
         {
+            if (webCamTexture2MatHelper == null)
+                return;
+
             webCamTexture2MatHelper.Stop();
         }
 
         public virtual void ChangeCamera()
         {
+            if (webCamTexture2MatHelper == null)
+                return;
+
 #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
             string deviceName = webCamTexture2MatHelper.GetDeviceName();
             int nextCameraIndex = -1;

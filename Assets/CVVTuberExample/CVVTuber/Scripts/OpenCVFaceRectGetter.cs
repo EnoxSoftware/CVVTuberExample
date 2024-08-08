@@ -30,7 +30,8 @@ namespace CVVTuber
 
         [Header("[Setting]")]
 
-        public string openCVCascadeFileName;
+        [Tooltip("Set the cascade file path, relative to the starting point of the \"StreamingAssets\" folder, or absolute path.")]
+        public string openCVCascadeFilePath;
 
         public bool useDownScaleMat;
 
@@ -58,9 +59,9 @@ namespace CVVTuber
 
         protected MatOfRect faces;
 
-        protected static readonly string OPENCV_CASCADE_FILENAME_PRESET = "DlibFaceLandmarkDetector/haarcascade_frontalface_alt.xml";
+        protected static readonly string OPENCV_CASCADE_FILEPATH_PRESET = "DlibFaceLandmarkDetector/haarcascade_frontalface_alt.xml";
 
-        protected string openCVCascadeFilePath;
+        protected string openCVCascadeFileFullPath;
 
 #if UNITY_WEBGL
         protected IEnumerator getFilePath_Coroutine;
@@ -76,25 +77,35 @@ namespace CVVTuber
 
         public override void Setup()
         {
+            Dispose();
 
             NullCheck(matSourceGetterInterface, "matSourceGetter");
 
-            if (string.IsNullOrEmpty(openCVCascadeFileName))
-                openCVCascadeFileName = OPENCV_CASCADE_FILENAME_PRESET;
+            if (string.IsNullOrEmpty(openCVCascadeFilePath))
+                openCVCascadeFilePath = OPENCV_CASCADE_FILEPATH_PRESET;
 
-#if UNITY_WEBGL
-            getFilePath_Coroutine = OpenCVForUnity.UnityUtils.Utils.getFilePathAsync(openCVCascadeFileName, (result) =>
+            Uri uri;
+            if (Uri.TryCreate(openCVCascadeFilePath, UriKind.Absolute, out uri))
             {
-                getFilePath_Coroutine = null;
-
-                openCVCascadeFilePath = result;
+                openCVCascadeFileFullPath = uri.OriginalString;
                 Run();
-            });
-            StartCoroutine(getFilePath_Coroutine);
+            }
+            else
+            {
+#if UNITY_WEBGL
+                getFilePath_Coroutine = OpenCVForUnity.UnityUtils.Utils.getFilePathAsync(openCVCascadeFilePath, (result) =>
+                {
+                    getFilePath_Coroutine = null;
+
+                    openCVCascadeFileFullPath = result;
+                    Run();
+                });
+                StartCoroutine(getFilePath_Coroutine);
 #else
-            openCVCascadeFilePath = OpenCVForUnity.UnityUtils.Utils.getFilePath(openCVCascadeFileName);
-            Run();
+                openCVCascadeFileFullPath = OpenCVForUnity.UnityUtils.Utils.getFilePath(openCVCascadeFilePath);
+                Run();
 #endif
+            }
         }
 
         public override void UpdateValue()
@@ -208,6 +219,12 @@ namespace CVVTuber
 
         public override void Dispose()
         {
+            if (cascade != null)
+            {
+                cascade.Dispose();
+                cascade = null;
+            }
+
             if (grayMat != null)
             {
                 grayMat.Dispose();
@@ -243,12 +260,17 @@ namespace CVVTuber
 
         protected virtual void Run()
         {
+            if (string.IsNullOrEmpty(openCVCascadeFileFullPath))
+            {
+                Debug.LogError("cascade file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
+            }
+
             cascade = new CascadeClassifier();
-            cascade.load(openCVCascadeFilePath);
+            cascade.load(openCVCascadeFileFullPath);
 #if !UNITY_WSA_10_0
             if (cascade.empty())
             {
-                Debug.LogError("cascade file is not loaded. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
+                Debug.LogError("cascade file is not loaded. " + openCVCascadeFileFullPath);
             }
 #endif
 

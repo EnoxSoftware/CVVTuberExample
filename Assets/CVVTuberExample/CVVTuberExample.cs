@@ -28,7 +28,7 @@ namespace CVVTuberExample
 
         static DlibShapePredictorNamePreset dlibShapePredictorName = DlibShapePredictorNamePreset.sp_human_face_68;
 
-        public static string dlibShapePredictorFileName
+        public static string dlibShapePredictorFilePath
         {
             get
             {
@@ -134,9 +134,16 @@ namespace CVVTuberExample
             SceneManager.LoadScene("Live2DCubism5CVVTuberExample");
         }
 
-        public void OnVRMCVVTuberExampleButtonClick()
+        public void OnVRM10CVVTuberExampleButtonClick()
         {
-            SceneManager.LoadScene("VRMCVVTuberExample");
+            if (GraphicsSettings.defaultRenderPipeline == null)
+            {
+                SceneManager.LoadScene("VRM10CVVTuberExample_Built-in");
+            }
+            else
+            {
+                SceneManager.LoadScene("VRM10CVVTuberExample_SRP");
+            }
         }
 
 

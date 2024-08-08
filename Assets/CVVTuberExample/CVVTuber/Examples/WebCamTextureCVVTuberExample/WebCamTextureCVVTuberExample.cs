@@ -20,8 +20,8 @@ namespace CVVTuberExample
         void Start()
         {
             // Load global settings.
-            dlibFaceLandmarkGetter.dlibShapePredictorFileName = CVVTuberExample.dlibShapePredictorFileName;
-            dlibFaceLandmarkGetter.dlibShapePredictorMobileFileName = CVVTuberExample.dlibShapePredictorFileName;
+            dlibFaceLandmarkGetter.dlibShapePredictorFilePath = CVVTuberExample.dlibShapePredictorFilePath;
+            dlibFaceLandmarkGetter.dlibShapePredictorMobileFilePath = CVVTuberExample.dlibShapePredictorFilePath;
         }
 
         /// <summary>
