@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace CVVTuberExample
 {
+    // v1.0.2
     public class FpsMonitor : MonoBehaviour
     {
         int tick = 0;
@@ -25,7 +26,7 @@ namespace CVVTuberExample
         const float MARGIN_Y = 10f;
         const float INNER_X = 8f;
         const float INNER_Y = 5f;
-        const float GUI_CONSOLE_HEIGHT = 50f;
+        const float GUI_CONSOLE_HEIGHT = 100f;
 
         public Vector2 offset = new Vector2(MARGIN_X, MARGIN_Y);
         public bool boxVisible = true;
@@ -48,7 +49,19 @@ namespace CVVTuberExample
         int oldScrHeight;
 
         Dictionary<string, string> outputDict = new Dictionary<string, string>();
-        public string consoleText;
+
+        protected string _consoleText = null;
+        public virtual string consoleText
+        {
+            get { return _consoleText; }
+            set
+            {
+                _consoleText = value;
+                toast_time = -1;
+            }
+        }
+
+        int toast_time = -1;
 
         // Use this for initialization
         void Start()
@@ -74,6 +87,11 @@ namespace CVVTuberExample
                 fps = tick / elapsed;
                 tick = 0;
                 elapsed = 0;
+            }
+
+            if (toast_time > 0)
+            {
+                toast_time = toast_time - 1;
             }
         }
 
@@ -105,18 +123,21 @@ namespace CVVTuberExample
 
             if (!string.IsNullOrEmpty(consoleText))
             {
-                if (boxVisible)
+                if (toast_time != 0)
                 {
-                    GUI.Box(console_outer, "");
-                }
+                    if (boxVisible)
+                    {
+                        GUI.Box(console_outer, "");
+                    }
 
-                GUILayout.BeginArea(console_inner);
-                {
-                    GUILayout.BeginVertical();
-                    GUILayout.Label(consoleText, console_labelStyle);
-                    GUILayout.EndVertical();
+                    GUILayout.BeginArea(console_inner);
+                    {
+                        GUILayout.BeginVertical();
+                        GUILayout.Label(consoleText, console_labelStyle);
+                        GUILayout.EndVertical();
+                    }
+                    GUILayout.EndArea();
                 }
-                GUILayout.EndArea();
             }
         }
 
@@ -153,6 +174,12 @@ namespace CVVTuberExample
             console_y = GetAlignedY(Alignment.LeftBottom, consoleHeight);
             console_outer = new Rect(console_x, console_y, Screen.width - offset.x * 2, consoleHeight);
             console_inner = new Rect(console_x + padding.x, console_y + padding.y, Screen.width - offset.x * 2 - padding.x, consoleHeight);
+        }
+
+        public void Toast(string message, int time = 120)
+        {
+            _consoleText = message;
+            toast_time = (time < 60) ? 60 : time;
         }
 
         float GetAlignedX(Alignment anchor, float w)
