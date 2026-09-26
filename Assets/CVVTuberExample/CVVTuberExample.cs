@@ -16,7 +16,10 @@ namespace CVVTuberExample
         public Text exampleTitle;
         public Text versionInfo;
         public ScrollRect scrollRect;
-        static float verticalNormalizedPosition = 1f;
+#if UNITY_6000_5_OR_NEWER
+        [Unity.Scripting.LifecycleManagement.NoAutoStaticsCleanup]
+#endif
+        private static float verticalNormalizedPosition = 1f;
 
         public enum DlibShapePredictorNamePreset : int
         {
@@ -28,7 +31,10 @@ namespace CVVTuberExample
 
         public Dropdown dlibShapePredictorNameDropdown;
 
-        static DlibShapePredictorNamePreset dlibShapePredictorName = DlibShapePredictorNamePreset.sp_human_face_68;
+#if UNITY_6000_5_OR_NEWER
+        [Unity.Scripting.LifecycleManagement.NoAutoStaticsCleanup]
+#endif
+        private static DlibShapePredictorNamePreset dlibShapePredictorName = DlibShapePredictorNamePreset.sp_human_face_68;
 
         public static string dlibShapePredictorFilePath
         {
@@ -39,11 +45,11 @@ namespace CVVTuberExample
         }
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
             exampleTitle.text = "CV VTuber Example " + Application.version;
 
-            versionInfo.text = Core.NATIVE_LIBRARY_NAME + " " + OpenCVEnv.GetVersion() + " (" + Core.VERSION + ")";
+            versionInfo.text = Core.NATIVE_LIBRARY_NAME + " " + OpenCVForUnityEnv.GetVersion() + " (" + Core.VERSION + ")";
             versionInfo.text += " / dlibfacelandmarkdetector" + " " + DlibEnv.GetVersion();
             versionInfo.text += " / UnityEditor " + Application.unityVersion;
             versionInfo.text += " / ";
@@ -80,7 +86,7 @@ namespace CVVTuberExample
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
 
         }
@@ -90,33 +96,20 @@ namespace CVVTuberExample
             verticalNormalizedPosition = scrollRect.verticalNormalizedPosition;
         }
 
-
         public void OnShowOpenCVLicenseButtonClick()
         {
             SceneManager.LoadScene("ShowOpenCVLicense");
         }
 
-        public void OnVideoCaptureCVVTuberExampleButtonClick()
+        public void OnMultiSourceCVVTuberExampleButtonClick()
         {
-            if (GraphicsSettings.defaultRenderPipeline == null)
+            if (GraphicsSettings.currentRenderPipeline == null)
             {
-                SceneManager.LoadScene("VideoCaptureCVVTuberExample_Built-in");
+                SceneManager.LoadScene("MultiSourceCVVTuberExample_Built-in");
             }
             else
             {
-                SceneManager.LoadScene("VideoCaptureCVVTuberExample_SRP");
-            }
-        }
-
-        public void OnWebCamTextureCVVTuberExampleButtonClick()
-        {
-            if (GraphicsSettings.defaultRenderPipeline == null)
-            {
-                SceneManager.LoadScene("WebCamTextureCVVTuberExample_Built-in");
-            }
-            else
-            {
-                SceneManager.LoadScene("WebCamTextureCVVTuberExample_SRP");
+                SceneManager.LoadScene("MultiSourceCVVTuberExample_SRP");
             }
         }
 
@@ -137,7 +130,7 @@ namespace CVVTuberExample
 
         public void OnVRM10CVVTuberExampleButtonClick()
         {
-            if (GraphicsSettings.defaultRenderPipeline == null)
+            if (GraphicsSettings.currentRenderPipeline == null)
             {
                 SceneManager.LoadScene("VRM10CVVTuberExample_Built-in");
             }
@@ -146,7 +139,6 @@ namespace CVVTuberExample
                 SceneManager.LoadScene("VRM10CVVTuberExample_SRP");
             }
         }
-
 
         public void OnDlibShapePredictorNameDropdownValueChanged(int result)
         {

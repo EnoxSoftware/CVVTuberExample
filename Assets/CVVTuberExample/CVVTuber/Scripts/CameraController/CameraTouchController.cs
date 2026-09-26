@@ -101,7 +101,9 @@ namespace CVVTuber
                 if (EventSystem.current != null)
                 {
                     if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+                    {
                         return;
+                    }
                 }
 
                 if (Input.touchCount == 1)
@@ -109,14 +111,19 @@ namespace CVVTuber
                     Touch touch = Input.GetTouch(0);
 
                     //rotate
-                    this.transform.parent.gameObject.transform.Rotate(0, touch.deltaPosition.x * rotateSpeed, 0);
+                    transform.parent.gameObject.transform.Rotate(0, touch.deltaPosition.x * rotateSpeed, 0);
 
                     //move
-                    this.transform.position += new Vector3(0, -touch.deltaPosition.y * moveSpeed / 10, 0);
-                    if (this.transform.localPosition.y < -2.0f)
-                        this.transform.localPosition = new Vector3(this.transform.localPosition.x, -2.0f, this.transform.localPosition.z);
-                    if (this.transform.localPosition.y > 2.0f)
-                        this.transform.localPosition = new Vector3(this.transform.localPosition.x, 2.0f, this.transform.localPosition.z);
+                    transform.position += new Vector3(0, -touch.deltaPosition.y * moveSpeed / 10, 0);
+                    if (transform.localPosition.y < -2.0f)
+                    {
+                        transform.localPosition = new Vector3(transform.localPosition.x, -2.0f, transform.localPosition.z);
+                    }
+
+                    if (transform.localPosition.y > 2.0f)
+                    {
+                        transform.localPosition = new Vector3(transform.localPosition.x, 2.0f, transform.localPosition.z);
+                    }
                 }
                 else if (Input.touchCount == 2)
                 {
@@ -132,12 +139,17 @@ namespace CVVTuber
                     float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
 
                     //zoom
-                    this.transform.localPosition += new Vector3(0, 0, deltaMagnitudeDiff * zoomSpeed / 10);
+                    transform.localPosition += new Vector3(0, 0, deltaMagnitudeDiff * zoomSpeed / 10);
 
-                    if (this.transform.localPosition.z < -5.0f)
-                        this.transform.localPosition = new Vector3(this.transform.localPosition.x, this.transform.localPosition.y, -5.0f);
-                    if (this.transform.localPosition.z > 5.0f)
-                        this.transform.localPosition = new Vector3(this.transform.localPosition.x, this.transform.localPosition.y, 5.0f);
+                    if (transform.localPosition.z < -5.0f)
+                    {
+                        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -5.0f);
+                    }
+
+                    if (transform.localPosition.z > 5.0f)
+                    {
+                        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 5.0f);
+                    }
                 }
             }
 #endif
@@ -162,10 +174,14 @@ namespace CVVTuber
             // Old Input System
             float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
             if (scrollWheel != 0.0f)
+            {
                 MouseWheel(scrollWheel);
+            }
 
             if (Input.GetMouseButtonDown(0))
+            {
                 preMousePos = Input.mousePosition;
+            }
 
             MouseDrag(Input.mousePosition);
 #endif
@@ -174,15 +190,15 @@ namespace CVVTuber
         protected virtual void MouseWheel(float delta)
         {
             //zoom
-            this.transform.localPosition += new Vector3(0, 0, delta * zoomSpeed * 10);
+            transform.localPosition += new Vector3(0, 0, delta * zoomSpeed * 10);
 
-            if (this.transform.localPosition.z < -5.0f)
+            if (transform.localPosition.z < -5.0f)
             {
-                this.transform.localPosition = new Vector3(this.transform.localPosition.x, this.transform.localPosition.y, -5.0f);
+                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -5.0f);
             }
-            if (this.transform.localPosition.z > 5.0f)
+            if (transform.localPosition.z > 5.0f)
             {
-                this.transform.localPosition = new Vector3(this.transform.localPosition.x, this.transform.localPosition.y, 5.0f);
+                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 5.0f);
             }
         }
 
@@ -211,14 +227,19 @@ namespace CVVTuber
             if (Input.GetMouseButton(0))
             {
                 // rotate
-                this.transform.parent.gameObject.transform.Rotate(0, diff.x * rotateSpeed, 0);
+                transform.parent.gameObject.transform.Rotate(0, diff.x * rotateSpeed, 0);
 
                 // move
-                this.transform.position += new Vector3(0, -diff.y * moveSpeed / 10, 0);
-                if (this.transform.localPosition.y < -2.0f)
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x, -2.0f, this.transform.localPosition.z);
-                if (this.transform.localPosition.y > 2.0f)
-                    this.transform.localPosition = new Vector3(this.transform.localPosition.x, 2.0f, this.transform.localPosition.z);
+                transform.position += new Vector3(0, -diff.y * moveSpeed / 10, 0);
+                if (transform.localPosition.y < -2.0f)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, -2.0f, transform.localPosition.z);
+                }
+
+                if (transform.localPosition.y > 2.0f)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, 2.0f, transform.localPosition.z);
+                }
             }
 #endif
 

@@ -7,7 +7,7 @@ namespace CVVTuber
     public class CVVTuberProcessOrderList : MonoBehaviour
     {
         [SerializeField]
-        List<CVVTuberProcess> processOrderList = default(List<CVVTuberProcess>);
+        private List<CVVTuberProcess> processOrderList = default(List<CVVTuberProcess>);
 
         public List<CVVTuberProcess> GetProcessOrderList()
         {

@@ -17,7 +17,10 @@ namespace CVVTuber
             get
             {
                 if (faceLandmarkGetter != null && _faceLandmarkGetterInterface == null)
+                {
                     _faceLandmarkGetterInterface = faceLandmarkGetter.GetComponent<IFaceLandmarkGetter>();
+                }
+
                 return _faceLandmarkGetterInterface;
             }
         }
@@ -69,7 +72,6 @@ namespace CVVTuber
 
         protected float distanceBetweenEyes;
 
-
         #region CVVTuberProcess
 
         public override void Setup()
@@ -80,7 +82,9 @@ namespace CVVTuber
         public override void UpdateValue()
         {
             if (faceLandmarkGetterInterface == null)
+            {
                 return;
+            }
 
             List<Vector2> points = faceLandmarkGetterInterface.GetFaceLanmarkPoints();
 
@@ -101,7 +105,6 @@ namespace CVVTuber
         }
 
         #endregion
-
 
         protected virtual void CalculateFacePartsDistance(List<Vector2> points)
         {

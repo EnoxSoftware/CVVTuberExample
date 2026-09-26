@@ -5,6 +5,6 @@ namespace CVVTuber
 {
     public interface IFaceLandmarkGetter
     {
-        List<Vector2> GetFaceLanmarkPoints();
+        public List<Vector2> GetFaceLanmarkPoints();
     }
 }

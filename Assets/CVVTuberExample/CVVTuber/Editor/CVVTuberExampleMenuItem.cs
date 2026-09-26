@@ -132,8 +132,9 @@ namespace CVVTuber
                 }
 
                 if (allComplete)
+                {
                     Debug.Log("CVVTuberExample setup is all complete!");
-
+                }
             }
             else
             {

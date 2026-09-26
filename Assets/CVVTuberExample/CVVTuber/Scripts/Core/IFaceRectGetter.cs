@@ -3,6 +3,6 @@ namespace CVVTuber
 {
     public interface IFaceRectGetter
     {
-        UnityEngine.Rect GetFaceRect();
+        public UnityEngine.Rect GetFaceRect();
     }
 }

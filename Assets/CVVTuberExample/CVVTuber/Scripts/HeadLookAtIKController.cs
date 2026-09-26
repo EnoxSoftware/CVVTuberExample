@@ -16,7 +16,10 @@ namespace CVVTuber
             get
             {
                 if (headRotationGetter != null && _headRotationGetterInterface == null)
+                {
                     _headRotationGetterInterface = headRotationGetter.GetComponent<IHeadRotationGetter>();
+                }
+
                 return _headRotationGetterInterface;
             }
         }
@@ -54,7 +57,6 @@ namespace CVVTuber
 
         protected Vector3 oldHeadEulerAngle;
 
-
         #region CVVTuberProcess
 
         public override string GetDescription()
@@ -71,7 +73,9 @@ namespace CVVTuber
                 AnimatorLookAtIKController headLookAtIKController = target.gameObject.GetComponent<AnimatorLookAtIKController>();
 
                 if (headLookAtIKController == null)
+                {
                     headLookAtIKController = target.gameObject.AddComponent<AnimatorLookAtIKController>();
+                }
 
                 if (lookAtTarget != null)
                 {
@@ -100,11 +104,19 @@ namespace CVVTuber
         public override void UpdateValue()
         {
             if (target == null)
+            {
                 return;
+            }
+
             if (headRotationGetterInterface == null)
+            {
                 return;
+            }
+
             if (lookAtRoot == null)
+            {
                 return;
+            }
 
             if (headRotationGetterInterface.GetHeadEulerAngles() != Vector3.zero)
             {

@@ -1,9 +1,9 @@
-using OpenCVForUnity.CoreModule;
-using OpenCVForUnity.ImgprocModule;
-using OpenCVForUnity.ObjdetectModule;
-using OpenCVForUnity.UnityIntegration;
 using System;
 using System.Collections;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.ImgprocModule;
+using OpenCVForUnity.UnityIntegration;
+using OpenCVForUnity.XobjdetectModule;
 using UnityEngine;
 using UnityEngine.UI;
 using Rect = OpenCVForUnity.CoreModule.Rect;
@@ -24,7 +24,10 @@ namespace CVVTuber
             get
             {
                 if (matSourceGetter != null && _matSourceGetterInterface == null)
+                {
                     _matSourceGetterInterface = matSourceGetter.GetComponent<IMatSourceGetter>();
+                }
+
                 return _matSourceGetterInterface;
             }
         }
@@ -68,7 +71,6 @@ namespace CVVTuber
         protected IEnumerator getFilePath_Coroutine;
 #endif
 
-
         #region CVVTuberProcess
 
         public override string GetDescription()
@@ -83,10 +85,11 @@ namespace CVVTuber
             NullCheck(matSourceGetterInterface, "matSourceGetter");
 
             if (string.IsNullOrEmpty(openCVCascadeFilePath))
+            {
                 openCVCascadeFilePath = OPENCV_CASCADE_FILEPATH_PRESET;
+            }
 
-            Uri uri;
-            if (Uri.TryCreate(openCVCascadeFilePath, UriKind.Absolute, out uri))
+            if (Uri.TryCreate(openCVCascadeFilePath, UriKind.Absolute, out Uri uri))
             {
                 openCVCascadeFileFullPath = uri.OriginalString;
                 Run();
@@ -94,7 +97,7 @@ namespace CVVTuber
             else
             {
 #if UNITY_WEBGL
-                getFilePath_Coroutine = OpenCVEnv.GetFilePathCoroutine(openCVCascadeFilePath, (result) =>
+                getFilePath_Coroutine = OpenCVForUnityEnv.GetFilePathCoroutine(openCVCascadeFilePath, (result) =>
                 {
                     getFilePath_Coroutine = null;
 
@@ -103,7 +106,7 @@ namespace CVVTuber
                 });
                 StartCoroutine(getFilePath_Coroutine);
 #else
-                openCVCascadeFileFullPath = OpenCVEnv.GetFilePath(openCVCascadeFilePath);
+                openCVCascadeFileFullPath = OpenCVForUnityEnv.GetFilePath(openCVCascadeFilePath);
                 Run();
 #endif
             }
@@ -112,10 +115,14 @@ namespace CVVTuber
         public override void UpdateValue()
         {
             if (cascade == null)
+            {
                 return;
+            }
 
             if (matSourceGetterInterface == null)
+            {
                 return;
+            }
 
             didUpdateFaceRect = false;
 
@@ -164,18 +171,19 @@ namespace CVVTuber
                 else
                 {
                     if (screen != null)
+                    {
                         screen.enabled = false;
+                    }
                 }
-
 
                 Imgproc.cvtColor(rgbaMat, grayMat, Imgproc.COLOR_RGBA2GRAY);
                 Imgproc.equalizeHist(grayMat, grayMat);
 
-
                 if (cascade != null)
+                {
                     cascade.detectMultiScale(grayMat, faces, 1.1, 2, 2, // TODO: objdetect.CV_HAAR_SCALE_IMAGE
                         new Size(grayMat.cols() * 0.2, grayMat.rows() * 0.2), new Size());
-
+                }
 
                 Rect[] rects = faces.toArray();
                 for (int i = 0; i < rects.Length; i++)
@@ -205,7 +213,9 @@ namespace CVVTuber
                         //Debug.Log ("detect faces " + rects [i]);
 
                         if (isDebugMode && screen != null)
+                        {
                             Imgproc.rectangle(debugMat, new Point(r.x, r.y), new Point(r.x + r.width, r.y + r.height), new Scalar(255, 0, 0, 255), 2);
+                        }
                     }
                 }
 
@@ -213,7 +223,7 @@ namespace CVVTuber
 
                 if (isDebugMode && screen != null)
                 {
-                    OpenCVMatUtils.MatToTexture2D(debugMat, debugTexture, debugColors);
+                    OpenCVMatUnityUtils.MatToTexture2D(debugMat, debugTexture, debugColors);
                 }
             }
         }
@@ -233,7 +243,9 @@ namespace CVVTuber
             }
 
             if (faces != null)
+            {
                 faces.Dispose();
+            }
 
             if (debugMat != null)
             {
@@ -258,7 +270,6 @@ namespace CVVTuber
 
         #endregion
 
-
         protected virtual void Run()
         {
             if (string.IsNullOrEmpty(openCVCascadeFileFullPath))
@@ -280,7 +291,6 @@ namespace CVVTuber
 
             didUpdateFaceRect = false;
         }
-
 
         #region IFaceRectGetter
 

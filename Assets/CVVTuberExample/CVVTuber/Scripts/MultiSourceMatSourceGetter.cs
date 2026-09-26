@@ -1,14 +1,15 @@
 using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.Extensions.SourceToMat;
 using OpenCVForUnity.UnityIntegration.Helper.Optimization;
-using OpenCVForUnity.UnityIntegration.Helper.Source2Mat;
+using OpenCVForUnity.UnityIntegration.Helper.SourceToMat;
 using UnityEngine;
 
 namespace CVVTuber
 {
-    [RequireComponent(typeof(MultiSource2MatHelper), typeof(ImageOptimizationHelper))]
+    [RequireComponent(typeof(MultiSourceToMatHelper), typeof(ImageOptimizationHelper))]
     public class MultiSourceMatSourceGetter : CVVTuberProcess, IMatSourceGetter
     {
-        protected MultiSource2MatHelper multiSource2MatHelper;
+        protected MultiSourceToMatHelper multiSourceToMatHelper;
 
         protected ImageOptimizationHelper imageOptimizationHelper;
 
@@ -17,7 +18,6 @@ namespace CVVTuber
         protected Mat downScaleResultMat;
 
         protected bool didUpdateResultMat;
-
 
         #region CVVTuberProcess
 
@@ -28,27 +28,38 @@ namespace CVVTuber
 
         public override void Setup()
         {
-            multiSource2MatHelper = gameObject.GetComponent<MultiSource2MatHelper>();
+            multiSourceToMatHelper = gameObject.GetComponent<MultiSourceToMatHelper>();
             imageOptimizationHelper = gameObject.GetComponent<ImageOptimizationHelper>();
 
-            multiSource2MatHelper.Initialize();
+            RegisterSourceEvents();
+            multiSourceToMatHelper.Initialize();
 
             didUpdateResultMat = false;
         }
 
         public override void UpdateValue()
         {
-            if (multiSource2MatHelper == null)
+            if (multiSourceToMatHelper == null)
+            {
                 return;
+            }
+
             if (imageOptimizationHelper == null)
+            {
                 return;
+            }
+
+            if (!multiSourceToMatHelper.IsInitialized)
+            {
+                return;
+            }
 
             didUpdateResultMat = false;
 
-            if (multiSource2MatHelper.IsPlaying() && multiSource2MatHelper.DidUpdateThisFrame() && !imageOptimizationHelper.IsCurrentFrameSkipped())
+            if (multiSourceToMatHelper.IsPlaying && multiSourceToMatHelper.DidUpdateThisFrame && !imageOptimizationHelper.IsCurrentFrameSkipped())
             {
 
-                resultMat = multiSource2MatHelper.GetMat();
+                resultMat = multiSourceToMatHelper.FrameMat;
                 downScaleResultMat = imageOptimizationHelper.GetDownScaleMat(resultMat);
 
                 didUpdateResultMat = true;
@@ -57,21 +68,27 @@ namespace CVVTuber
 
         public override void Dispose()
         {
-            if (multiSource2MatHelper != null)
-                multiSource2MatHelper.Dispose();
+            if (multiSourceToMatHelper != null)
+            {
+                UnregisterSourceEvents();
+                multiSourceToMatHelper.Dispose();
+            }
 
             if (imageOptimizationHelper != null)
+            {
                 imageOptimizationHelper.Dispose();
+            }
 
             if (resultMat != null)
             {
-                resultMat.Dispose();
                 resultMat = null;
             }
+
+            didUpdateResultMat = false;
+            downScaleResultMat = null;
         }
 
         #endregion
-
 
         #region IMatSourceGetter
 
@@ -102,45 +119,62 @@ namespace CVVTuber
         public virtual float GetDownScaleRatio()
         {
             if (imageOptimizationHelper == null)
+            {
                 return default;
+            }
 
             return imageOptimizationHelper.DownscaleRatio;
         }
 
         #endregion
 
-
         public virtual void Play()
         {
-            if (multiSource2MatHelper == null)
+            if (multiSourceToMatHelper == null)
+            {
                 return;
+            }
 
-            multiSource2MatHelper.Play();
+            multiSourceToMatHelper.Play();
         }
 
         public virtual void Pause()
         {
-            if (multiSource2MatHelper == null)
+            if (multiSourceToMatHelper == null)
+            {
                 return;
+            }
 
-            multiSource2MatHelper.Pause();
+            multiSourceToMatHelper.Pause();
         }
 
         public virtual void Stop()
         {
-            if (multiSource2MatHelper == null)
+            if (multiSourceToMatHelper == null)
+            {
                 return;
+            }
 
-            multiSource2MatHelper.Stop();
+            multiSourceToMatHelper.Stop();
         }
 
         public virtual void ChangeCamera()
         {
-            if (multiSource2MatHelper == null)
+            if (multiSourceToMatHelper == null)
+            {
                 return;
+            }
 
 #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
-            string deviceName = multiSource2MatHelper.GetDeviceName();
+            ICameraMatSource cameraMatSource = multiSourceToMatHelper.MatSource as ICameraMatSource;
+            ICameraToMatHelperControls cameraControls = multiSourceToMatHelper.ActiveHelper as ICameraToMatHelperControls;
+            ICameraFacingToMatHelperControls facingControls = multiSourceToMatHelper.ActiveHelper as ICameraFacingToMatHelperControls;
+            if (cameraMatSource == null || cameraControls == null || facingControls == null)
+            {
+                return;
+            }
+
+            string deviceName = cameraMatSource.DeviceName;
             int nextCameraIndex = -1;
             for (int cameraIndex = 0; cameraIndex < WebCamTexture.devices.Length; cameraIndex++)
             {
@@ -152,15 +186,87 @@ namespace CVVTuber
             }
             if (nextCameraIndex != -1)
             {
-                multiSource2MatHelper.RequestedDeviceName = nextCameraIndex.ToString();
+                cameraControls.RequestedDeviceName = nextCameraIndex.ToString();
             }
             else
             {
-                multiSource2MatHelper.RequestedIsFrontFacing = !multiSource2MatHelper.RequestedIsFrontFacing;
+                facingControls.RequestedIsFrontFacing = !facingControls.RequestedIsFrontFacing;
             }
 #else
-            multiSource2MatHelper.RequestedIsFrontFacing = !multiSource2MatHelper.RequestedIsFrontFacing;
+            ICameraFacingToMatHelperControls facingControls = multiSourceToMatHelper.ActiveHelper as ICameraFacingToMatHelperControls;
+            if (facingControls == null)
+            {
+                return;
+            }
+
+            facingControls.RequestedIsFrontFacing = !facingControls.RequestedIsFrontFacing;
 #endif
+        }
+
+        private void RegisterSourceEvents()
+        {
+            if (multiSourceToMatHelper == null)
+            {
+                return;
+            }
+
+            multiSourceToMatHelper.OnInitialized.RemoveListener(OnSourceInitialized);
+            multiSourceToMatHelper.OnFrameMatLayoutChanged.RemoveListener(OnFrameMatLayoutChanged);
+            multiSourceToMatHelper.OnReleased.RemoveListener(OnSourceReleased);
+            multiSourceToMatHelper.OnDisposed.RemoveListener(OnSourceDisposed);
+
+            multiSourceToMatHelper.OnInitialized.AddListener(OnSourceInitialized);
+            multiSourceToMatHelper.OnFrameMatLayoutChanged.AddListener(OnFrameMatLayoutChanged);
+            multiSourceToMatHelper.OnReleased.AddListener(OnSourceReleased);
+            multiSourceToMatHelper.OnDisposed.AddListener(OnSourceDisposed);
+        }
+
+        private void UnregisterSourceEvents()
+        {
+            if (multiSourceToMatHelper == null)
+            {
+                return;
+            }
+
+            multiSourceToMatHelper.OnInitialized.RemoveListener(OnSourceInitialized);
+            multiSourceToMatHelper.OnFrameMatLayoutChanged.RemoveListener(OnFrameMatLayoutChanged);
+            multiSourceToMatHelper.OnReleased.RemoveListener(OnSourceReleased);
+            multiSourceToMatHelper.OnDisposed.RemoveListener(OnSourceDisposed);
+        }
+
+        private void OnSourceInitialized()
+        {
+            if (multiSourceToMatHelper == null)
+            {
+                return;
+            }
+
+            if (!multiSourceToMatHelper.IsPlaying && !multiSourceToMatHelper.IsPaused)
+            {
+                multiSourceToMatHelper.Play();
+            }
+        }
+
+        private void OnFrameMatLayoutChanged()
+        {
+            ClearFrameState();
+        }
+
+        private void OnSourceReleased()
+        {
+            ClearFrameState();
+        }
+
+        private void OnSourceDisposed()
+        {
+            ClearFrameState();
+        }
+
+        private void ClearFrameState()
+        {
+            didUpdateResultMat = false;
+            resultMat = null;
+            downScaleResultMat = null;
         }
     }
 }

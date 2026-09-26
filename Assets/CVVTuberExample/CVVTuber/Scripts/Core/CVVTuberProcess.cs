@@ -10,27 +10,35 @@ namespace CVVTuber
         protected virtual void Start()
         {
             if (callInUnityLifeCycle)
+            {
                 Setup();
+            }
         }
 
         protected virtual void FixedUpdate()
         {
             if (callInUnityLifeCycle)
+            {
                 FixedUpdateValue();
+            }
         }
 
         // Update is called once per frame
         protected virtual void Update()
         {
             if (callInUnityLifeCycle)
+            {
                 UpdateValue();
+            }
         }
 
         // Update is called once per frame
         protected virtual void LateUpdate()
         {
             if (callInUnityLifeCycle)
+            {
                 LateUpdateValue();
+            }
         }
 
         protected virtual void OnDestroy()
@@ -68,15 +76,17 @@ namespace CVVTuber
             return "";
         }
 
-        protected virtual void NullCheck(System.Object obj, string name)
+        protected virtual void NullCheck(object obj, string name)
         {
             if (obj == null)
+            {
                 NullWarning(name);
+            }
         }
 
         protected virtual void NullWarning(string name)
         {
-            Debug.LogWarning("[" + this.GetType().FullName + "] " + name + " == null");
+            Debug.LogWarning("[" + GetType().FullName + "] " + name + " == null");
         }
     }
 }

@@ -9,7 +9,6 @@ namespace CVVTuber
 
         public SkinnedMeshRenderer FACE_DEF;
 
-
         #region CVVTuberProcess
 
         public override string GetDescription()
@@ -20,7 +19,9 @@ namespace CVVTuber
         public override void LateUpdateValue()
         {
             if (FACE_DEF == null)
+            {
                 return;
+            }
 
             if (enableEye)
             {
@@ -46,7 +47,6 @@ namespace CVVTuber
         }
 
         #endregion
-
 
         #region FaceAnimationController
 

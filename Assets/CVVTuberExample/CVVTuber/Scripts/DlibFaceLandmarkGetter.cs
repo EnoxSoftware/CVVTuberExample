@@ -1,11 +1,11 @@
-using DlibFaceLandmarkDetector;
-using DlibFaceLandmarkDetector.UnityIntegration;
-using OpenCVForUnity.CoreModule;
-using OpenCVForUnity.ImgprocModule;
-using OpenCVForUnity.UnityIntegration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DlibFaceLandmarkDetector;
+using DlibFaceLandmarkDetector.Extensions;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.ImgprocModule;
+using OpenCVForUnity.UnityIntegration;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,7 +25,10 @@ namespace CVVTuber
             get
             {
                 if (matSourceGetter != null && _matSourceGetterInterface == null)
+                {
                     _matSourceGetterInterface = matSourceGetter.GetComponent<IMatSourceGetter>();
+                }
+
                 return _matSourceGetterInterface;
             }
         }
@@ -40,7 +43,10 @@ namespace CVVTuber
             get
             {
                 if (faceRectGetter != null && _faceRectGetterInterface == null)
+                {
                     _faceRectGetterInterface = faceRectGetter.GetComponent<IFaceRectGetter>();
+                }
+
                 return _faceRectGetterInterface;
             }
         }
@@ -83,7 +89,6 @@ namespace CVVTuber
         protected IEnumerator getFilePath_Coroutine;
 #endif
 
-
         #region CVVTuberProcess
 
         public override string GetDescription()
@@ -98,11 +103,14 @@ namespace CVVTuber
             NullCheck(matSourceGetterInterface, "matSourceGetter");
 
             if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
+            {
                 dlibShapePredictorFilePath = DLIB_SHAPEPREDICTOR_FILEPATH_PRESET;
+            }
 
             if (string.IsNullOrEmpty(dlibShapePredictorMobileFilePath))
+            {
                 dlibShapePredictorMobileFilePath = DLIB_SHAPEPREDICTOR_MOBILE_FILEPATH_PRESET;
-
+            }
 
 #if UNITY_WEBGL
             Uri uri;
@@ -113,7 +121,7 @@ namespace CVVTuber
             }
             else
             {
-                getFilePath_Coroutine = OpenCVEnv.GetFilePathCoroutine(dlibShapePredictorMobileFilePath, (result) =>
+                getFilePath_Coroutine = OpenCVForUnityEnv.GetFilePathCoroutine(dlibShapePredictorMobileFilePath, (result) =>
                 {
                     getFilePath_Coroutine = null;
 
@@ -132,17 +140,16 @@ namespace CVVTuber
             }
             else
             {
-                dlibShapePredictorFileFullPath = OpenCVEnv.GetFilePath(dlibShapePredictorMobileFilePath);
+                dlibShapePredictorFileFullPath = OpenCVForUnityEnv.GetFilePath(dlibShapePredictorMobileFilePath);
             }
 #else
-            Uri uri;
-            if (Uri.TryCreate(dlibShapePredictorFilePath, UriKind.Absolute, out uri))
+            if (Uri.TryCreate(dlibShapePredictorFilePath, UriKind.Absolute, out Uri uri))
             {
                 dlibShapePredictorFileFullPath = uri.OriginalString;
             }
             else
             {
-                dlibShapePredictorFileFullPath = OpenCVEnv.GetFilePath(dlibShapePredictorFilePath);
+                dlibShapePredictorFileFullPath = OpenCVForUnityEnv.GetFilePath(dlibShapePredictorFilePath);
             }
 #endif     
 
@@ -153,10 +160,14 @@ namespace CVVTuber
         public override void UpdateValue()
         {
             if (faceLandmarkDetector == null)
+            {
                 return;
+            }
 
             if (matSourceGetterInterface == null)
+            {
                 return;
+            }
 
             didUpdateFaceLanmarkPoints = false;
 
@@ -206,9 +217,10 @@ namespace CVVTuber
                 else
                 {
                     if (screen != null)
+                    {
                         screen.enabled = false;
+                    }
                 }
-
 
                 if (faceRectGetterInterface != null)
                 {
@@ -232,7 +244,9 @@ namespace CVVTuber
                         didUpdateFaceLanmarkPoints = true;
 
                         if (isDebugMode && screen != null)
+                        {
                             DlibOpenCVUtils.DrawFaceLandmark(debugMat, points, new Scalar(0, 255, 0, 255), 2);
+                        }
                     }
                 }
                 else
@@ -264,7 +278,9 @@ namespace CVVTuber
                         didUpdateFaceLanmarkPoints = true;
 
                         if (isDebugMode && screen != null)
+                        {
                             DlibOpenCVUtils.DrawFaceLandmark(debugMat, points, new Scalar(0, 255, 0, 255), 2);
+                        }
                     }
                 }
 
@@ -272,7 +288,7 @@ namespace CVVTuber
 
                 if (isDebugMode && screen != null)
                 {
-                    OpenCVMatUtils.MatToTexture2D(debugMat, debugTexture, debugColors);
+                    OpenCVMatUnityUtils.MatToTexture2D(debugMat, debugTexture, debugColors);
                 }
             }
         }
@@ -308,7 +324,6 @@ namespace CVVTuber
 
         #endregion
 
-
         protected virtual void Run()
         {
             if (string.IsNullOrEmpty(dlibShapePredictorFileFullPath))
@@ -320,7 +335,6 @@ namespace CVVTuber
 
             didUpdateFaceLanmarkPoints = false;
         }
-
 
         #region IFaceLandmarkGetter
 

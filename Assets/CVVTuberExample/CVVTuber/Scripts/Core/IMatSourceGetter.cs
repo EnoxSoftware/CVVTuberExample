@@ -4,10 +4,10 @@ namespace CVVTuber
 {
     public interface IMatSourceGetter
     {
-        Mat GetMatSource();
+        public Mat GetMatSource();
 
-        Mat GetDownScaleMatSource();
+        public Mat GetDownScaleMatSource();
 
-        float GetDownScaleRatio();
+        public float GetDownScaleRatio();
     }
 }

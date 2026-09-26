@@ -25,15 +25,15 @@ namespace CVVTuber
 
         protected virtual void Start()
         {
-            this.animator = GetComponent<Animator>();
+            animator = GetComponent<Animator>();
         }
 
         protected virtual void OnAnimatorIK(int layerIndex)
         {
             if (animator != null)
             {
-                this.animator.SetLookAtWeight(weight, bodyWeight, headWeight, eyesWeightt, clampWeight);
-                this.animator.SetLookAtPosition(looktAtTarget.position);
+                animator.SetLookAtWeight(weight, bodyWeight, headWeight, eyesWeightt, clampWeight);
+                animator.SetLookAtPosition(looktAtTarget.position);
             }
         }
     }

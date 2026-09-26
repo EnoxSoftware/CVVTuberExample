@@ -1,9 +1,10 @@
-using OpenCVForUnity.Calib3dModule;
-using OpenCVForUnity.CoreModule;
-using OpenCVForUnity.UnityIntegration;
 using System.Collections.Generic;
+using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.Extensions;
+using OpenCVForUnity.GeometryModule;
+using OpenCVForUnity.UnityIntegration;
 using UnityEngine;
-using static OpenCVForUnity.UnityIntegration.OpenCVARUtils;
+using static OpenCVForUnity.Extensions.OpenCVARUtils;
 
 namespace CVVTuber
 {
@@ -21,7 +22,10 @@ namespace CVVTuber
             get
             {
                 if (matSourceGetter != null && _matSourceGetterInterface == null)
+                {
                     _matSourceGetterInterface = matSourceGetter.GetComponent<IMatSourceGetter>();
+                }
+
                 return _matSourceGetterInterface;
             }
         }
@@ -36,7 +40,10 @@ namespace CVVTuber
             get
             {
                 if (faceLandmarkGetter != null && _faceLandmarkGetterInterface == null)
+                {
                     _faceLandmarkGetterInterface = faceLandmarkGetter.GetComponent<IFaceLandmarkGetter>();
+                }
+
                 return _faceLandmarkGetterInterface;
             }
         }
@@ -85,7 +92,6 @@ namespace CVVTuber
         protected Matrix4x4 invertZM;
 
         protected Matrix4x4 VP;
-
 
         #region CVVTuberProcess
 
@@ -147,10 +153,14 @@ namespace CVVTuber
         public override void UpdateValue()
         {
             if (matSourceGetterInterface == null)
+            {
                 return;
+            }
 
             if (faceLandmarkGetterInterface == null)
+            {
                 return;
+            }
 
             Mat rgbaMat = matSourceGetterInterface.GetMatSource();
             if (rgbaMat == null)
@@ -222,9 +232,8 @@ namespace CVVTuber
                 {
                     rvec = new Mat(3, 1, CvType.CV_64FC1);
                     tvec = new Mat(3, 1, CvType.CV_64FC1);
-                    Calib3d.solvePnP(objectPoints, imagePoints, camMatrix, distCoeffs, rvec, tvec);
+                    Geometry.solvePnP(objectPoints, imagePoints, camMatrix, distCoeffs, rvec, tvec);
                 }
-
 
                 double tvec_x = tvec.get(0, 0)[0], tvec_y = tvec.get(1, 0)[0], tvec_z = tvec.get(2, 0)[0];
 
@@ -234,16 +243,18 @@ namespace CVVTuber
                 {
                     float x = pos.x / pos.w, y = pos.y / pos.w, z = pos.z / pos.w;
                     if (x < -1.0f || x > 1.0f || y < -1.0f || y > 1.0f || z < -1.0f || z > 1.0f)
+                    {
                         isNotInViewport = true;
+                    }
                 }
 
                 if (double.IsNaN(tvec_z) || isNotInViewport)
                 { // if tvec is wrong data, do not use extrinsic guesses. (the estimated object is not in the camera field of view)
-                    Calib3d.solvePnP(objectPoints, imagePoints, camMatrix, distCoeffs, rvec, tvec);
+                    Geometry.solvePnP(objectPoints, imagePoints, camMatrix, distCoeffs, rvec, tvec);
                 }
                 else
                 {
-                    Calib3d.solvePnP(objectPoints, imagePoints, camMatrix, distCoeffs, rvec, tvec, true, Calib3d.SOLVEPNP_ITERATIVE);
+                    Geometry.solvePnP(objectPoints, imagePoints, camMatrix, distCoeffs, rvec, tvec, true);
                 }
 
                 //Debug.Log (tvec.dump () + " " + isNotInViewport);
@@ -259,7 +270,10 @@ namespace CVVTuber
                     PoseData poseData = OpenCVARUtils.ConvertRvecTvecToPoseData(rvecArr, tvecArr);
 
                     // adjust the position to the scale of real-world space.
-                    poseData.Pos = new Vector3(poseData.Pos.x * 0.001f, poseData.Pos.y * 0.001f, poseData.Pos.z * 0.001f);
+                    poseData.Translation = new OpenCVForUnity.Extensions.Vec3d(
+                        poseData.Translation.Item1 * 0.001,
+                        poseData.Translation.Item2 * 0.001,
+                        poseData.Translation.Item3 * 0.001);
 
                     // Changes in pos/rot below these thresholds are ignored.
                     if (enableLowPassFilter)
@@ -268,7 +282,10 @@ namespace CVVTuber
                     }
                     oldPoseData = poseData;
 
-                    Matrix4x4 transformationM = Matrix4x4.TRS(poseData.Pos, poseData.Rot, Vector3.one);
+                    Matrix4x4 transformationM = Matrix4x4.TRS(
+                        poseData.ToVector3(),
+                        poseData.ToQuaternion(),
+                        Vector3.one);
 
                     // right-handed coordinates system (OpenCV) to left-handed one (Unity)
                     // https://stackoverflow.com/questions/30234945/change-handedness-of-a-row-major-4x4-transformation-matrix
@@ -288,25 +305,37 @@ namespace CVVTuber
         public override void Dispose()
         {
             if (objectPoints68 != null)
+            {
                 objectPoints68.Dispose();
+            }
 
             if (camMatrix != null)
+            {
                 camMatrix.Dispose();
+            }
+
             if (distCoeffs != null)
+            {
                 distCoeffs.Dispose();
+            }
 
             if (imagePoints != null)
+            {
                 imagePoints.Dispose();
+            }
 
             if (rvec != null)
+            {
                 rvec.Dispose();
+            }
 
             if (tvec != null)
+            {
                 tvec.Dispose();
+            }
         }
 
         #endregion
-
 
         #region IHeadPositionGetter
 
@@ -323,7 +352,6 @@ namespace CVVTuber
         }
 
         #endregion
-
 
         #region IHeadRotationGetter
 
@@ -344,7 +372,6 @@ namespace CVVTuber
             if (didUpdateHeadPositionAndRotation)
             {
 
-
                 return headRotation.eulerAngles;
             }
             else
@@ -354,7 +381,6 @@ namespace CVVTuber
         }
 
         #endregion
-
 
         protected virtual void SetCameraMatrix(Mat camMatrix, float width, float height)
         {

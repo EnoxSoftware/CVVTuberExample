@@ -16,7 +16,10 @@ namespace CVVTuber
             get
             {
                 if (headRotationGetter != null && _headRotationGetterInterface == null)
+                {
                     _headRotationGetterInterface = headRotationGetter.GetComponent<IHeadRotationGetter>();
+                }
+
                 return _headRotationGetterInterface;
             }
         }
@@ -50,7 +53,6 @@ namespace CVVTuber
 
         protected Vector3 oldHeadEulerAngle;
 
-
         #region CVVTuberProcess
 
         public override string GetDescription()
@@ -75,9 +77,14 @@ namespace CVVTuber
         public override void LateUpdateValue()
         {
             if (headRotationGetterInterface == null)
+            {
                 return;
+            }
+
             if (target == null)
+            {
                 return;
+            }
 
             if (headRotationGetterInterface.GetHeadEulerAngles() != Vector3.zero)
             {

@@ -17,7 +17,7 @@ namespace CVVTuberExample
         public DlibFaceLandmarkGetter dlibFaceLandmarkGetter;
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
             // Load global settings.
             dlibFaceLandmarkGetter.dlibShapePredictorFilePath = CVVTuberExample.dlibShapePredictorFilePath;

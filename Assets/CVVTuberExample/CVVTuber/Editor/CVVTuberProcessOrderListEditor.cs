@@ -7,9 +7,9 @@ namespace CVVTuber
     [CustomEditor(typeof(CVVTuberProcessOrderList), true)]
     public class CVVTuberProcessOrderListEditor : Editor
     {
-        ReorderableList m_list;
+        private ReorderableList m_list;
 
-        void OnEnable()
+        private void OnEnable()
         {
             m_list = new ReorderableList(
                 serializedObject,
